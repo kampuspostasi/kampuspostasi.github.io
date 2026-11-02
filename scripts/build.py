@@ -372,6 +372,7 @@ ve burs veren kurumların resmî duyurularını kontrol etmenizi öneririz.</p>
         '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
         + "".join(f"<url><loc>{abs_u(x)}</loc></url>" for x in urls) + "</urlset>", "utf-8")
     (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {abs_u('/sitemap.xml')}\n", "utf-8")
+    (OUT / "googlef4093a426f60860e.html").write_text("google-site-verification: googlef4093a426f60860e.html", "utf-8")
     (OUT / ".nojekyll").write_text("")
     print(f"✔ Site üretildi: {len(items)} haber, {len(urls)} URL -> {OUT}")
 
