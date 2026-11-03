@@ -203,13 +203,17 @@ def sidebar(items: list[dict], exclude: str = "") -> str:
 
 
 def pick_lead(items: list[dict]) -> dict:
-    # Son 2 gün içinde özeti olan, burs/KYK ağırlıklı bir haberi manşete taşı
-    recent = [e for e in items[:40] if e.get("summary")]
-    for pref in ("Burslar", "KYK & Yurtlar", "Sınavlar"):
+    # En güncel (son 10) haber içinden burs/KYK/sınav/üniversite manşetini seç
+    recent = items[:10]
+    for pref in ("Burslar", "KYK & Yurtlar", "Üniversiteler", "Sınavlar"):
+        for e in recent:
+            if e["category"] == pref and e.get("summary"):
+                return e
+    for pref in ("Burslar", "KYK & Yurtlar", "Üniversiteler", "Sınavlar"):
         for e in recent:
             if e["category"] == pref:
                 return e
-    return recent[0] if recent else items[0]
+    return items[0]
 
 
 def main() -> None:
@@ -224,7 +228,7 @@ def main() -> None:
     # ---------------- Ana sayfa
     lead = pick_lead(items)
     used = {lead["slug"]}
-    seconds = [e for e in items[:40] if e["slug"] not in used and e.get("summary")][:3]
+    seconds = [e for e in items[:15] if e["slug"] not in used][:3]
     used |= {e["slug"] for e in seconds}
     briefs = [e for e in items if e["slug"] not in used][:6]
     used |= {e["slug"] for e in briefs}

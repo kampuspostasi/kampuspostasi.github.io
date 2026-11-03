@@ -52,8 +52,9 @@ KEYWORDS = [
 
 EXCLUDE = [
     "ara tatil", "karne", "ilkokul", "anaokulu", "okul öncesi", "lgs", "ortaokul",
-    "ders saati", "cumhuriyet bayramı", "lise öğrencileri", "veli", "öğretmen ataması",
-    "bursluluk sınavı", "iokbs", "ilköğretim", "okul çevreleri", "kantin", "servis ücreti",
+    "ders saati", "cumhuriyet bayramı", "lise öğrencileri", "liselilere", "meslek lisesi",
+    "veli", "öğretmen ataması", "bursluluk sınavı", "iokbs", "ilköğretim", "okul çevreleri",
+    "kantin", "servis ücreti",
 ]
 
 CATEGORY_RULES = [
