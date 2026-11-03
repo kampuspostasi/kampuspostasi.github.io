@@ -309,9 +309,14 @@ def main() -> None:
             "description": (e["summary"] or e["title"])[:300], "mainEntityOfPage": abs_u(path),
             "publisher": {"@type": "Organization", "name": SITE_NAME}, "isBasedOn": e["source_url"],
         }, ensure_ascii=False)
-        lede = (f'<p class="lede">{escape(e["summary"])}</p>' if e.get("summary") else
-                f'<p class="lede">Haberin ayrıntıları {escape(e["source"])} tarafından yayımlandı. '
-                f'Tam metne aşağıdaki bağlantıdan ulaşabilirsiniz.</p>')
+        body_paras = e.get("body") or ([e["summary"]] if e.get("summary") else [])
+        if body_paras:
+            lede = f'<p class="lede">{escape(body_paras[0])}</p>'
+            rest = "".join(f"<p>{escape(p)}</p>" for p in body_paras[1:])
+            prose = f'<div class="prose">{rest}</div>' if rest else ""
+        else:
+            lede = f'<p class="lede">{escape(e["title"])}</p>'
+            prose = ""
         rel = "".join(
             f'<li><a href="{href(r)}">{escape(r["title"])}</a><time>{short_when(r["published"])}</time></li>' for r in related)
         body = f"""<div class="two-col article-wrap">
@@ -319,13 +324,13 @@ def main() -> None:
   {kicker(e)}
   <h1>{escape(e['title'])}</h1>
   <div class="article-meta">
-    <span>Kaynak: <b>{escape(e['source'])}</b></span>
+    <span>Kampüs Postası Haber Merkezi</span>
     <time datetime="{e['published']}">{d.day} {AYLAR[d.month - 1]} {d.year}, {d:%H:%M}</time>
   </div>
   {lede}
-  <p class="readon"><a href="{escape(e['source_url'])}" target="_blank" rel="noopener nofollow">Haberin tamamı: {escape(e['source'])} ↗</a></p>
+  {prose}
   <div class="tags">{tags}</div>
-  <p class="disclaimer">Başvuru tarihleri, şartlar ve sonuçlar için ilgili kurumun resmî duyurusunu esas alınız.</p>
+  <p class="disclaimer">Kaynak: <a href="{escape(e['source_url'])}" target="_blank" rel="noopener nofollow">{escape(e['source'])}</a> · Başvuru tarihleri, şartlar ve sonuçlar için ilgili kurumun resmî duyurusunu esas alınız.</p>
   {f'<section class="related"><h4 class="label">Bu bölümden</h4><ul>{rel}</ul></section>' if rel else ""}
 </article>
 {sidebar(items, "")}

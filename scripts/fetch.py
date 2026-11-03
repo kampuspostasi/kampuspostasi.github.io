@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Burs Radarı - günlük haber toplayıcı ve akıllı Türkçe editör.
+"""Kampüs Postası - haber toplayıcı, tam metin çözücü ve editoryal yeniden yazım motoru.
 
-Eğitim ve burs RSS kaynaklarını tarar, üniversite/burs ile ilgili haberleri seçer,
-clickbait/SEO kalabalığını temizler, benzer haberleri tekilleştirir, etiket üretir
-ve data/news.json'a yazar. GEMINI_API_KEY varsa ek olarak LLM özeti kullanır;
-yoksa yerleşik Türkçe metin motoruyla tamamen anahtarsız çalışır.
+RSS ve Google Haberler kaynaklarını tarar, Google yönlendirme linklerini çözer,
+kaynak sayfadan tam metni çeker, SEO/clickbait kalabalığını temizler, cümle yapısını ve
+ifade biçimini Kampüs Postası editoryal diline dönüştürerek çok paragraflı özgün haber
+metni (body) üretir.
 """
 from __future__ import annotations
 
+import concurrent.futures
 import hashlib
 import html
 import json
@@ -15,6 +16,7 @@ import os
 import re
 import sys
 import time
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
@@ -24,7 +26,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA_FILE = ROOT / "data" / "news.json"
 MAX_ITEMS = 1500
-UA = "Mozilla/5.0 (compatible; BursRadariBot/1.0; +https://github.com)"
+UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 
 FEEDS = [
     ("Hürriyet", "https://www.hurriyet.com.tr/rss/egitim"),
@@ -94,6 +96,48 @@ STOPWORDS = {
     "2026", "2027", "haber", "haberleri", "sonuçları", "sonucu", "başvuru", "başvuruları",
 }
 
+JUNK_PHRASES = [
+    "tüm hakları saklıdır", "gizlilik politikası", "çerez politikası", "abone ol",
+    "bizi takip edin", "haberin devamı", "google haberler", "whatsapp", "telegram",
+    "instagram", "facebook", "twitter", "yorum yap", "okuma süresi", "editör:",
+    "reklam", "sponsorlu", "ilgili haberler", "bunlar da ilginizi çekebilir",
+    "kopyalanamaz", "izinsiz kullanılamaz", "aa / ", "iha / ", "dha / ",
+    "paylaş yorumlar", "google algoritmasına", "tercih edilen kaynak", "aşağıdaki e-posta",
+    "sonraki haber", "önceki haber", "yazı boyutu", "haberi paylaş",
+]
+
+# Editoryal yeniden yazım dönüşüm sözlüğü (kaynak cümle kalıplarını özgünleştirir)
+REWRITE_MAP = [
+    (r"\bgerçekleştirilecek\b", "yapılacak"),
+    (r"\bgerçekleştirildi\b", "tamamlandı"),
+    (r"\bgerçekleştirilen\b", "düzenlenen"),
+    (r"\berişime açıldı\b", "yayımlandı"),
+    (r"\berişime sunuldu\b", "açıklandı"),
+    (r"\bbaşvuruda bulunmak isteyen adayların\b", "başvuracak öğrencilerin"),
+    (r"\bbaşvuruda bulunacak adayların\b", "başvuru yapacak adayların"),
+    (r"\bbaşvuruda bulunabilir\b", "başvurabilir"),
+    (r"\bbaşvuru yapmayı düşünen adayların\b", "başvurmayı planlayan öğrencilerin"),
+    (r"\böğrenim gören\b", "okuyan"),
+    (r"\bönem taşıyor\b", "gerekiyor"),
+    (r"\bönem taşımaktadır\b", "kritik görülüyor"),
+    (r"\bdikkat çekiyor\b", "öne çıkıyor"),
+    (r"\besas alınmalıdır\b", "dikkate alınmalı"),
+    (r"\besas alınacak\b", "geçerli olacak"),
+    (r"\bbelirtildi\b", "bildirildi"),
+    (r"\bifade edildi\b", "aktarıldı"),
+    (r"\bkaydedildi\b", "vurgulandı"),
+    (r"\baçıklamalarda bulundu\b", "bilgi verdi"),
+    (r"\bhayata geçirilen\b", "başlatılan"),
+    (r"\bhayata geçirildi\b", "uygulamaya alındı"),
+    (r"\binternet sitesi üzerinden\b", "web sayfasından"),
+    (r"\bresmî internet sitesinde\b", "resmî sayfasında"),
+    (r"\bresmi internet sitesinde\b", "resmî sayfasında"),
+    (r"\bmerakla beklenen\b", "beklenen"),
+    (r"\byoğun ilgi gören\b", "ilgi gören"),
+    (r"\bgözler [a-zçğıöşü\s]+ çevrildi\.?", ""),
+    (r"\bgeri sayım başladı!?\.?", ""),
+]
+
 
 def tr_lower(s: str) -> str:
     return s.replace("İ", "i").replace("I", "ı").lower()
@@ -142,28 +186,22 @@ def is_similar(t1: str, t2: str) -> bool:
 
 def clean_title(raw: str) -> str:
     t = raw.strip()
-    # "Son dakika..." gibi girişleri kaldır
     t = re.sub(r"^(son dakika\.{0,3}|flaş\.{0,3})\s*[:\-!]?\s*", "", t, flags=re.I)
-    # "|" ile ayrılmış çoklu SEO başlıklarında en anlamlı parçayı seç
     if " | " in t:
         parts = [p.strip() for p in t.split(" | ") if len(p.strip()) > 15]
         if parts:
-            # Büyük harf oranı daha düşük olan parçayı tercih et
             parts.sort(key=lambda p: sum(1 for c in p if c.isupper()) / max(1, len(p)))
             t = parts[0]
-    # "BÜYÜK HARF SEO BAŞLIĞI: Normal başlık" kalıbını temizle
     if ":" in t:
         left, right = t.split(":", 1)
         upper_ratio = sum(1 for c in left if c.isupper()) / max(1, sum(1 for c in left if c.isalpha()))
         if len(right.strip()) >= 20 and (upper_ratio > 0.6 or "sorgulama ekranı" in tr_lower(left)):
             t = right.strip()
-    # Tamamı BÜYÜK HARF ise tümce düzenine çevir
     alpha = [c for c in t if c.isalpha()]
     if alpha and sum(1 for c in alpha if c.isupper()) / len(alpha) > 0.75:
         t = tr_capitalize(tr_lower(t))
-        for acr in ["KYK", "YKS", "ÖSYM", "YÖK", "KPSS", "ALES", "YDS", "DGS", "VGM", "TEV", "GSB", "TÜBİTAK", "İBB", "AÖF", "DHBT"]:
+        for acr in ["KYK", "YKS", "ÖSYM", "YÖK", "KPSS", "ALES", "YDS", "DGS", "VGM", "TEV", "GSB", "TÜBİTAK", "İBB", "AÖF", "DHBT", "TDK"]:
             t = re.sub(rf"\b{tr_lower(acr)}\b", acr, t)
-    # Birden fazla soru cümlesi arka arkaya dizilmişse ilkini tut
     if t.count("?") >= 2:
         first_q = t.split("?", 1)[0].strip() + "?"
         if len(first_q) >= 25:
@@ -174,25 +212,175 @@ def clean_title(raw: str) -> str:
     return tr_capitalize(t)
 
 
-def clean_summary(title: str, raw_desc: str, source: str, category: str) -> str:
-    d = raw_desc.strip()
-    # Google News açıklaması genelde başlığın tekrarı + kaynak adıdır; temizle
-    if not d or norm_title(d)[:40] == norm_title(title)[:40] or len(d) < 45:
+def paraphrase_sentence(s: str) -> str:
+    out = s.strip()
+    # Başlangıçtaki breadcrumb/kategori veya satır içi reklam kalıntılarını temizle
+    out = re.sub(r"^Ana Sayfa\s+[^\n.]{5,90}\b(burs|haber|eğitim)\s+", "", out, flags=re.I)
+    out = re.sub(r"^[A-ZÇĞİÖŞÜ][a-zçğıöşü]+\s+burs\s+başvuruları\s+(?=[A-ZÇĞİÖŞÜ])", "", out)
+    # Tamamı büyük harf olan ara başlık cümlelerini ele
+    alpha = [c for c in out if c.isalpha()]
+    if alpha and sum(1 for c in alpha if c.isupper()) / len(alpha) > 0.7:
         return ""
-    # SEO dolgu cümlelerini ayıkla
-    sentences = re.split(r"(?<=[.!?])\s+", d)
-    kept = []
-    for s in sentences:
-        sl = tr_lower(s)
-        if s.count(",") >= 3 and ("ne zaman" in sl or "sorgulama" in sl):
+    for pat, repl in REWRITE_MAP:
+        out = re.sub(pat, repl, out, flags=re.I)
+    out = re.sub(r"\s+", " ", out).strip()
+    return tr_capitalize(out) if out else ""
+
+
+def is_seo_spam_sentence(s: str) -> bool:
+    sl = tr_lower(s)
+    if len(s) < 35:
+        return True
+    if any(j in sl for j in JUNK_PHRASES):
+        return True
+    if s.count("?") >= 2:
+        return True
+    if s.count(",") >= 3 and any(w in sl for w in ["ne zaman", "sorgulama", "açıklandı mı", "kaç tl"]):
+        return True
+    if any(p in sl for p in [
+        "haberimizde", "işte detaylar", "merak konusu oldu", "yoğun şekilde araştırılıyor",
+        "aramaları hız kazandı", "gündemdeki yerini koruyor", "sorularının yanıtı",
+        "detaylar haberimizde", "haberin detayları", "merak edilen tarih",
+    ]):
+        return True
+    return False
+
+
+def resolve_google_url(url: str) -> str:
+    if "news.google.com" not in url or "/articles/" not in url:
+        return url
+    try:
+        aid = url.split("/articles/")[1].split("?")[0]
+        req = urllib.request.Request(f"https://news.google.com/articles/{aid}", headers={"User-Agent": UA})
+        page = urllib.request.urlopen(req, timeout=8).read().decode("utf-8", errors="ignore")
+        sg = re.search(r'data-n-a-sg="([^"]+)"', page)
+        ts = re.search(r'data-n-a-ts="([^"]+)"', page)
+        if not (sg and ts):
+            return url
+        payload = (
+            f'[[["Fbv4je","[\\"garturlreq\\",[[\\"tr\\",\\"TR\\",[\\"FINANCE_TOP_INDICES\\",\\"WEB_TEST_1_0_0\\"],'
+            f'null,null,1,1,\\"TR:tr\\",null,180,null,null,null,null,null,0,1],\\"tr\\",\\"TR\\",1,[2,4,8],1,1,'
+            f'\\"655000234\\",0,0,null,0],\\"{aid}\\",{ts.group(1)},\\"{sg.group(1)}\\"]",null,"generic"]]]'
+        )
+        r2 = urllib.request.Request(
+            "https://news.google.com/_/DotsSplashUi/data/batchexecute",
+            data=urllib.parse.urlencode({"f.req": payload}).encode(),
+            headers={"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8", "User-Agent": UA},
+        )
+        res = urllib.request.urlopen(r2, timeout=8).read().decode("utf-8", errors="ignore")
+        m = re.search(r'\\"(https?://[^\\"]+)\\"', res)
+        if m and "news.google.com" not in m.group(1):
+            return m.group(1)
+    except Exception:
+        pass
+    return url
+
+
+def fetch_raw_article(url: str) -> tuple[str, list[str]]:
+    """Haberin gerçek URL'sini çözer ve ham paragraf listesini döndürür."""
+    real_url = resolve_google_url(url)
+    paragraphs: list[str] = []
+    try:
+        req = urllib.request.Request(real_url, headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            real_url = resp.geturl() or real_url
+            raw = resp.read().decode("utf-8", errors="ignore")
+    except Exception:
+        return real_url, paragraphs
+
+    # 1. JSON-LD articleBody varsa en temiz tam metin oradadır
+    for m in re.findall(r'"articleBody"\s*:\s*"((?:[^"\\]|\\.)*)"', raw):
+        try:
+            body_txt = html.unescape(json.loads('"' + m + '"'))
+            body_txt = re.sub(r"<[^>]+>", " ", body_txt)
+            for chunk in re.split(r"(?:\r?\n)+|(?<=[.!?])\s+(?=[A-ZÇĞİÖŞÜ0-9])", body_txt):
+                c = re.sub(r"\s+", " ", chunk).strip()
+                if len(c) >= 45:
+                    paragraphs.append(c)
+            if len(paragraphs) >= 3:
+                return real_url, paragraphs
+        except Exception:
+            pass
+
+    # 2. HTML <p> etiketlerinden çek
+    cleaned_html = re.sub(r"<(script|style|nav|footer|header|aside|form|noscript)[^>]*>.*?</\1>", " ", raw, flags=re.S | re.I)
+    for p in re.findall(r"<p[^>]*>(.*?)</p>", cleaned_html, flags=re.S | re.I):
+        txt = strip_html(p)
+        if len(txt) >= 50:
+            paragraphs.append(txt)
+
+    return real_url, paragraphs
+
+
+def build_editorial_article(title: str, raw_desc: str, raw_paragraphs: list[str], category: str, source: str) -> tuple[str, list[str]]:
+    """Ham paragrafları ve açıklamayı temizler, yeniden yazar ve (summary, body_list) döndürür."""
+    candidates: list[str] = []
+    if raw_desc:
+        for s in re.split(r"(?<=[.!?])\s+", raw_desc):
+            if len(s.strip()) >= 40:
+                candidates.append(s.strip())
+    for p in raw_paragraphs:
+        for s in re.split(r"(?<=[.!?])\s+", p):
+            if len(s.strip()) >= 40:
+                candidates.append(s.strip())
+
+    # SEO spam, tekrar ve başlık kopyalarını ele
+    seen_norms: list[str] = [norm_title(title)]
+    clean_sentences: list[str] = []
+    for s in candidates:
+        if is_seo_spam_sentence(s):
             continue
-        if any(p in sl for p in ["haberimizde", "işte detaylar", "merak konusu oldu", "yoğun şekilde araştırılıyor"]):
+        rw = paraphrase_sentence(s)
+        if len(rw) < 40:
             continue
-        kept.append(s.strip())
-    out = " ".join(kept).strip() or d
-    if len(out) > 360:
-        out = out[:350].rsplit(" ", 1)[0] + "…"
-    return out
+        nt = norm_title(rw)
+        if any(nt[:45] == sn[:45] or is_similar(rw, sn) for sn in seen_norms):
+            continue
+        seen_norms.append(nt)
+        clean_sentences.append(rw)
+        if len(clean_sentences) >= 14:
+            break
+
+    # Cümleleri 2'şerli akıcı paragraflar halinde grupla
+    body: list[str] = []
+    for i in range(0, len(clean_sentences), 2):
+        para = " ".join(clean_sentences[i:i + 2]).strip()
+        if para:
+            body.append(para)
+        if len(body) >= 6:
+            break
+
+    # Eğer kaynak sayfa koruma/JS arkasındaysa ve hiç paragraf çıkmadıysa bağlamsal editoryal metin üret
+    if not body:
+        t_clean = title.rstrip(".?!")
+        if category == "Burslar":
+            body = [
+                f"{t_clean} başlığıyla duyurulan burs programına ilişkin başvuru takvimi ve değerlendirme süreci öğrencilerin gündeminde yer alıyor.",
+                "Adayların başvuru ekranı açıldığında öğrenim belgesi, transkript ve gelir durumunu gösteren belgeleri eksiksiz hazırlaması gerekiyor. Başvurular ilgili kurumun resmî başvuru sistemi üzerinden alınıyor.",
+                f"Kontenjan, aylık ödeme tutarı ve kesin sonuç tarihleri için duyuruyu yayımlayan kurumun resmî açıklamaları takip edilmeli.",
+            ]
+        elif category == "KYK & Yurtlar":
+            body = [
+                f"{t_clean} konusuyla ilgili Gençlik ve Spor Bakanlığı (GSB) ile Kredi ve Yurtlar Genel Müdürlüğü süreci yürütülüyor.",
+                "KYK burs, öğrenim kredisi ve yurt işlemlerinin tamamı e-Devlet kapısı üzerinden T.C. kimlik numarası ile sorgulanabiliyor. Taahhütname onayı ve kayıt takvimine dikkat edilmesi gerekiyor.",
+                "Resmî duyurular yayımlandıkça başvuru ekranları ve sonuç belgeleri e-Devlet sisteminde güncelleniyor.",
+            ]
+        elif category == "Sınavlar":
+            body = [
+                f"{t_clean} gelişmesi, sınava hazırlanan adaylar ve tercih sürecindeki öğrenciler tarafından yakından izleniyor.",
+                "Sınav giriş belgeleri, başvuru kılavuzları ve sonuç açıklamaları ÖSYM'nin Aday İşlemleri Sistemi (AİS) üzerinden erişime açılıyor.",
+                "Adayların başvuru ve geç başvuru günlerini kaçırmamak için resmî sınav takvimini kontrol etmesi öneriliyor.",
+            ]
+        else:
+            body = [
+                f"{t_clean} başlıklı gelişme, yükseköğretim gündeminde öne çıkan konular arasında yer aldı.",
+                "Üniversite öğrencilerini ve akademik birimleri ilgilendiren düzenlemenin uygulama detayları ilgili kurumların duyuru sayfalarında paylaşılıyor.",
+            ]
+
+    summary = body[0]
+    if len(summary) > 320:
+        summary = summary[:310].rsplit(" ", 1)[0] + "…"
+    return summary, body
 
 
 def extract_tags(title: str, desc: str) -> list[str]:
@@ -247,7 +435,7 @@ def parse_feed(source: str, raw: bytes) -> list[dict]:
                 real_source = t_src.strip()
         desc = strip_html(it.findtext("description") or "")
         if source == "Google Haberler":
-            desc = ""  # Google RSS açıklaması sadece başlık tekrarı içerir
+            desc = ""
         items.append({
             "source": real_source,
             "source_url": link,
@@ -275,51 +463,30 @@ def rule_category(title: str, desc: str = "") -> str:
     return "Üniversiteler"
 
 
-def gemini_process(batch: list[dict], api_key: str) -> dict[int, dict]:
-    model = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-    listing = "\n\n".join(
-        f"[{i}] KAYNAK: {b['source']}\nBAŞLIK: {b['raw_title']}\nAÇIKLAMA: {b['raw_desc'][:700]}"
-        for i, b in enumerate(batch)
+def enrich_item(e: dict) -> dict:
+    """Tek bir haberi kaynak sayfasından çekip yeniden yazar."""
+    real_url, raw_paras = fetch_raw_article(e["source_url"])
+    if real_url and "news.google.com" not in real_url:
+        e["source_url"] = real_url
+    summary, body = build_editorial_article(
+        e["title"],
+        e.get("raw_desc", "") or e.get("summary", ""),
+        raw_paras,
+        e["category"],
+        e["source"],
     )
-    prompt = f"""Sen "Burs Radarı" adlı, üniversite öğrencileri ve adayları için burs ve üniversite
-haberleri yayınlayan bir Türkçe sitenin editörüsün. Aşağıdaki haberleri değerlendir.
-
-Her haber için:
-- relevant: Üniversite öğrencisi/adayı/mezunu için faydalıysa true. İlkokul/lise/MEB idari haberleri false.
-- category: Şunlardan biri: {", ".join(CATEGORIES)}
-- title: En fazla 90 karakter, clickbait olmayan, net ve bilgilendirici yeni bir başlık.
-- summary: 2-4 cümlelik, tamamen KENDİ CÜMLELERİNLE yazılmış özgün özet.
-- tags: 2-4 kısa etiket (küçük harf).
-
-Sadece JSON dizi döndür: [{{"id":0,"relevant":true,"category":"...","title":"...","summary":"...","tags":["..."]}}]
-
-HABERLER:
-{listing}"""
-    body = json.dumps({
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.4, "responseMimeType": "application/json"},
-    }).encode()
-    for attempt in range(3):
-        try:
-            req = urllib.request.Request(url, data=body, headers={
-                "Content-Type": "application/json", "x-goog-api-key": api_key})
-            with urllib.request.urlopen(req, timeout=120) as r:
-                resp = json.load(r)
-            text = resp["candidates"][0]["content"]["parts"][0]["text"]
-            arr = json.loads(text)
-            return {int(o["id"]): o for o in arr if "id" in o}
-        except Exception as e:
-            print(f"  ! Gemini denemesi {attempt + 1} başarısız: {e}", file=sys.stderr)
-            time.sleep(5 * (attempt + 1))
-    return {}
+    e["summary"] = summary
+    e["body"] = body
+    e["tags"] = e.get("tags") or extract_tags(e["title"], " ".join(body))
+    e.pop("raw_desc", None)
+    e.pop("clean_title", None)
+    return e
 
 
 def main() -> None:
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
     raw_existing: list[dict] = json.loads(DATA_FILE.read_text("utf-8")) if DATA_FILE.exists() else []
 
-    # Mevcut haberleri de yeni filtre ve başlık temizleyiciden geçir
     existing: list[dict] = []
     seen_links: set[str] = set()
     seen_titles: list[str] = []
@@ -334,8 +501,6 @@ def main() -> None:
             continue
         e["title"] = ct
         e["category"] = rule_category(ct, e.get("summary", ""))
-        e["summary"] = clean_summary(ct, e.get("summary", ""), e["source"], e["category"])
-        e["tags"] = e.get("tags") or extract_tags(ct, e["summary"])
         seen_links.add(e["source_url"])
         seen_titles.append(ct)
         used_slugs.add(e["slug"])
@@ -350,7 +515,8 @@ def main() -> None:
         except Exception as e:
             print(f"! {source} alınamadı: {e}", file=sys.stderr)
 
-    new: list[dict] = []
+    new_items: list[dict] = []
+    now = datetime.now(timezone.utc).isoformat()
     for it in fetched:
         if it["source_url"] in seen_links or not is_candidate(it):
             continue
@@ -359,56 +525,39 @@ def main() -> None:
             continue
         seen_links.add(it["source_url"])
         seen_titles.append(ct)
-        it["clean_title"] = ct
-        new.append(it)
-    print(f"→ {len(new)} yeni tekil aday haber")
-
-    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    results: dict[int, dict] = {}
-    if api_key and new:
-        for start in range(0, len(new), 25):
-            chunk = new[start:start + 25]
-            res = gemini_process(chunk, api_key)
-            for k, v in res.items():
-                results[start + k] = v
-            time.sleep(2)
-        print(f"→ Gemini {len(results)}/{len(new)} haberi işledi")
-    elif not api_key:
-        print("✓ Yerleşik Türkçe metin motoru aktif (API anahtarı gerekmiyor)")
-
-    now = datetime.now(timezone.utc).isoformat()
-    added = []
-    for idx, it in enumerate(new):
-        r = results.get(idx)
-        if r is not None and not r.get("relevant", True):
-            continue
-        if r is not None:
-            title = clean_title(r.get("title") or it["clean_title"])
-            category = r.get("category") if r.get("category") in CATEGORIES else rule_category(title, it["raw_desc"])
-            summary = (r.get("summary") or "").strip() or clean_summary(title, it["raw_desc"], it["source"], category)
-            tags = [str(t)[:30] for t in (r.get("tags") or [])][:4] or extract_tags(title, summary)
-            ai = True
-        else:
-            title = it["clean_title"]
-            category = rule_category(title, it["raw_desc"])
-            summary = clean_summary(title, it["raw_desc"], it["source"], category)
-            tags = extract_tags(title, summary)
-            ai = False
-
-        base = slugify(title)
+        base = slugify(ct)
         slug = base if base not in used_slugs else f"{base}-{hashlib.md5(it['source_url'].encode()).hexdigest()[:6]}"
         used_slugs.add(slug)
-        added.append({
-            "slug": slug, "title": title, "summary": summary, "category": category, "tags": tags,
-            "source": it["source"], "source_url": it["source_url"], "raw_title": it["raw_title"],
-            "published": it["published"], "added": now, "ai": ai,
+        cat = rule_category(ct, it["raw_desc"])
+        new_items.append({
+            "slug": slug,
+            "title": ct,
+            "summary": "",
+            "body": [],
+            "category": cat,
+            "tags": [],
+            "source": it["source"],
+            "source_url": it["source_url"],
+            "raw_title": it["raw_title"],
+            "raw_desc": it["raw_desc"],
+            "published": it["published"],
+            "added": now,
+            "ai": False,
         })
+    print(f"→ {len(new_items)} yeni tekil aday haber")
 
-    all_items = existing + added
+    # Tam metni olmayan mevcut haberleri + yeni haberleri paralel olarak çekip yeniden yaz
+    to_enrich = new_items + [e for e in existing if not e.get("body") or len(e.get("body", [])) < 2]
+    if to_enrich:
+        print(f"→ {len(to_enrich)} haberin tam metni çekiliyor ve yeniden yazılıyor...")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
+            list(pool.map(enrich_item, to_enrich))
+
+    all_items = existing + new_items
     all_items.sort(key=lambda e: e["published"], reverse=True)
     all_items = all_items[:MAX_ITEMS]
     DATA_FILE.write_text(json.dumps(all_items, ensure_ascii=False, indent=1), "utf-8")
-    print(f"✔ {len(added)} yeni haber eklendi. Toplam: {len(all_items)}")
+    print(f"✔ {len(new_items)} yeni haber eklendi, tüm metinler hazır. Toplam: {len(all_items)}")
 
 
 if __name__ == "__main__":
