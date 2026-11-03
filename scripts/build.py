@@ -139,6 +139,18 @@ def layout(title: str, body: str, *, desc: str = DESC, path: str = "/", jsonld: 
   </div>
   <div class="wrap copy">© {NOW.year} Kampüs Postası. Başvuru tarihleri ve şartlar için ilgili kurumların resmî duyurularını esas alınız.</div>
 </footer>
+<script>
+(function(){{
+  if(location.hostname!=='kampuspostasi.github.io')return;
+  const b='https://abacus.jasoncameron.dev/hit/kampuspostasi/',d=new Date().toISOString().slice(0,10);
+  fetch(b+'total_views').catch(()=>{{}});
+  fetch(b+'views_'+d).catch(()=>{{}});
+  try{{
+    if(!localStorage.getItem('kp_u')){{localStorage.setItem('kp_u','1');fetch(b+'unique_visitors').catch(()=>{{}});}}
+    if(localStorage.getItem('kp_d')!==d){{localStorage.setItem('kp_d',d);fetch(b+'uniques_'+d).catch(()=>{{}});}}
+  }}catch(e){{}}
+}})();
+</script>
 </body>
 </html>"""
 
