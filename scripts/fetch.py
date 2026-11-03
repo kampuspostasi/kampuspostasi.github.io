@@ -212,6 +212,22 @@ def clean_title(raw: str) -> str:
     return tr_capitalize(t)
 
 
+def strip_page_chrome(s: str, title: str) -> str:
+    """Kaynak sayfadan sızan 'Ana Sayfa > Kategori > Başlık etiket' kalıntılarını keser."""
+    out = re.sub(r"^(Ana Sayfa|Kaynak Ekle|Anasayfa)\s+", "", s.strip(), flags=re.I)
+    tl, ol = tr_lower(title.rstrip("…. ")), tr_lower(out)
+    for key in (tl, tl[-35:], tl[:35]):
+        if len(key) >= 18:
+            pos = ol.find(key)
+            if 0 <= pos < 260 and len(out) - (pos + len(key)) > 40:
+                out = out[pos + len(key):].lstrip(" :!?.-–")
+                break
+    # Başta kalan "Başvurular Başladı burs " veya tek kelimelik etiketleri temizle
+    out = re.sub(r"^(başvuruları?\s+başladı!?\.?\s+)?(burs|haber|eğitim|üniversite)\s+(?=[A-ZÇĞİÖŞÜ0-9])", "", out, flags=re.I)
+    out = re.sub(r"^Binlerce Öğrencinin Beklediği [^\n.]{5,50} İçin\s+", "", out)
+    return tr_capitalize(out.strip())
+
+
 def paraphrase_sentence(s: str) -> str:
     out = s.strip()
     # Başlangıçtaki breadcrumb/kategori veya satır içi reklam kalıntılarını temizle
@@ -316,11 +332,11 @@ def build_editorial_article(title: str, raw_desc: str, raw_paragraphs: list[str]
     """Ham paragrafları ve açıklamayı temizler, yeniden yazar ve (summary, body_list) döndürür."""
     candidates: list[str] = []
     if raw_desc:
-        for s in re.split(r"(?<=[.!?])\s+", raw_desc):
+        for s in re.split(SENT_SPLIT, raw_desc):
             if len(s.strip()) >= 40:
                 candidates.append(s.strip())
     for p in raw_paragraphs:
-        for s in re.split(r"(?<=[.!?])\s+", p):
+        for s in re.split(SENT_SPLIT, p):
             if len(s.strip()) >= 40:
                 candidates.append(s.strip())
 
@@ -330,7 +346,7 @@ def build_editorial_article(title: str, raw_desc: str, raw_paragraphs: list[str]
     for s in candidates:
         if is_seo_spam_sentence(s):
             continue
-        rw = paraphrase_sentence(s)
+        rw = paraphrase_sentence(strip_page_chrome(s, title))
         if len(rw) < 40:
             continue
         nt = norm_title(rw)
@@ -340,6 +356,9 @@ def build_editorial_article(title: str, raw_desc: str, raw_paragraphs: list[str]
         clean_sentences.append(rw)
         if len(clean_sentences) >= 14:
             break
+
+    # Önce başlıktaki sorunun net cevabını seç, kalan cümleler "Ayrıntılar" olsun
+    answer, clean_sentences = pick_answer(title, clean_sentences)
 
     # Cümleleri 2'şerli akıcı paragraflar halinde grupla
     body: list[str] = []
@@ -377,10 +396,68 @@ def build_editorial_article(title: str, raw_desc: str, raw_paragraphs: list[str]
                 "Üniversite öğrencilerini ve akademik birimleri ilgilendiren düzenlemenin uygulama detayları ilgili kurumların duyuru sayfalarında paylaşılıyor.",
             ]
 
-    summary = body[0]
-    if len(summary) > 320:
-        summary = summary[:310].rsplit(" ", 1)[0] + "…"
-    return summary, body
+    if not answer:
+        answer = body[0] if body else title
+        body = body[1:]
+    return answer, body
+
+
+SENT_SPLIT = r"(?<=[a-zçğıöşüA-ZÇĞİÖŞÜ)\"”'’][.!?])\s+"
+
+MONTHS_RE = r"(ocak|şubat|mart|nisan|mayıs|haziran|temmuz|ağustos|eylül|ekim|kasım|aralık)"
+
+# Soru tipi -> (başlıkta tetikleyici kelimeler, cevap cümlesinde aranan işaretler)
+QUESTION_TYPES = [
+    ("para", ["kaç tl", "ne kadar", "ücret", "miktar", "tutar", "kaç lira"],
+     [r"\d[\d.]*\s*(tl|lira)\b", r"\btl\b", r"\blira\b"]),
+    ("nasıl", ["nasıl", "nereden", "nerede", "sorgula", "hangi site", "ekranı"],
+     [r"e-devlet", r"turkiye\.gov\.tr", r"\.gov\.tr", r"üzerinden", r"adresinden", r"sistem", r"ekranından", r"giriş yap"]),
+    ("şart", ["şart", "kimler", "kimlere", "koşul", "gerekli belge", "hangi belge"],
+     [r"şart", r"koşul", r"başvurabil", r"gerek", r"belge", r"öğrenciler"]),
+    ("zaman", ["ne zaman", "tarih", "hangi gün", "saat kaç", "kaç gün", "takvim"],
+     [MONTHS_RE, r"\d{1,2}[./]\d{1,2}", r"tarihleri arasında", r"henüz", r"bekleniyor", r"açıklanacak",
+      r"hafta", r"gün içinde", r"\bsaat\b"]),
+    ("durum", ["açıklandı mı", "başladı mı", "belli oldu mu", "yatırıldı mı", "çıktı mı", "uzatıldı mı"],
+     [r"henüz", r"açıklanmadı", r"açıklandı", r"başladı", r"bekleniyor", r"paylaşmadı", r"duyurul", MONTHS_RE]),
+]
+
+
+def pick_answer(title: str, sentences: list[str]) -> tuple[str, list[str]]:
+    """Başlıktaki soruya en doğrudan cevap veren 1-2 cümleyi seçer."""
+    if not sentences:
+        return "", sentences
+    tl = tr_lower(title)
+    qtypes = [q for q in QUESTION_TYPES if any(k in tl for k in q[1])]
+    ttoks = title_tokens(title)
+
+    def score(i: int, s: str) -> float:
+        sl = tr_lower(s)
+        sc = 0.0
+        for _, _, markers in qtypes:
+            sc += 3 * sum(1 for m in markers if re.search(m, sl))
+        if re.search(r"\d", s):
+            sc += 1
+        sc += 0.6 * len(ttoks & title_tokens(s))
+        sc -= 0.25 * i                      # erken cümleler genelde daha özdür
+        if "?" in s:
+            sc -= 4                         # soru cümlesi cevap değildir
+        if len(s) > 280:
+            sc -= 1.5
+        return sc
+
+    ranked = sorted(((score(i, s), i) for i, s in enumerate(sentences)), reverse=True)
+    best_i = ranked[0][1]
+    chosen = [best_i]
+    # Cevap tek cümleyse ve kısaysa, tamamlayıcı en iyi ikinci cümleyi yanına ekle
+    if len(sentences[best_i]) < 165 and len(ranked) > 1:
+        if best_i + 1 < len(sentences) and "?" not in sentences[best_i + 1] and len(sentences[best_i + 1]) < 210:
+            chosen.append(best_i + 1)
+        elif ranked[1][0] > 0 and "?" not in sentences[ranked[1][1]] and len(sentences[ranked[1][1]]) < 210:
+            chosen.append(ranked[1][1])
+            chosen.sort()
+    answer = " ".join(sentences[i] for i in chosen)
+    rest = [s for i, s in enumerate(sentences) if i not in chosen]
+    return answer, rest
 
 
 def extract_tags(title: str, desc: str) -> list[str]:
@@ -547,7 +624,7 @@ def main() -> None:
     print(f"→ {len(new_items)} yeni tekil aday haber")
 
     # Tam metni olmayan mevcut haberleri + yeni haberleri paralel olarak çekip yeniden yaz
-    to_enrich = new_items + [e for e in existing if not e.get("body") or len(e.get("body", [])) < 2]
+    to_enrich = new_items + [e for e in existing if not e.get("summary")]
     if to_enrich:
         print(f"→ {len(to_enrich)} haberin tam metni çekiliyor ve yeniden yazılıyor...")
         with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:

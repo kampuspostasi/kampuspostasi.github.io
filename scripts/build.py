@@ -309,14 +309,11 @@ def main() -> None:
             "description": (e["summary"] or e["title"])[:300], "mainEntityOfPage": abs_u(path),
             "publisher": {"@type": "Organization", "name": SITE_NAME}, "isBasedOn": e["source_url"],
         }, ensure_ascii=False)
-        body_paras = e.get("body") or ([e["summary"]] if e.get("summary") else [])
-        if body_paras:
-            lede = f'<p class="lede">{escape(body_paras[0])}</p>'
-            rest = "".join(f"<p>{escape(p)}</p>" for p in body_paras[1:])
-            prose = f'<div class="prose">{rest}</div>' if rest else ""
-        else:
-            lede = f'<p class="lede">{escape(e["title"])}</p>'
-            prose = ""
+        answer = e.get("summary") or ""
+        details = [p for p in (e.get("body") or []) if p.strip() and p.strip() != answer.strip()]
+        lede = f'<p class="answer">{escape(answer or e["title"])}</p>'
+        prose = ("<h2 class=\"details-h\">Ayrıntılar</h2><div class=\"prose\">"
+                 + "".join(f"<p>{escape(p)}</p>" for p in details) + "</div>") if details else ""
         rel = "".join(
             f'<li><a href="{href(r)}">{escape(r["title"])}</a><time>{short_when(r["published"])}</time></li>' for r in related)
         body = f"""<div class="two-col article-wrap">
