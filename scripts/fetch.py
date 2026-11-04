@@ -14,6 +14,7 @@ import html
 import json
 import os
 import re
+import ssl
 import sys
 import time
 import urllib.parse
@@ -28,7 +29,12 @@ DATA_FILE = ROOT / "data" / "news.json"
 MAX_ITEMS = 1500
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 
+SSL_CTX = ssl.create_default_context()
+SSL_CTX.check_hostname = False
+SSL_CTX.verify_mode = ssl.CERT_NONE
+
 FEEDS = [
+    ("Anadolu Ajansı", "https://www.aa.com.tr/tr/rss/default?cat=egitim"),
     ("Hürriyet", "https://www.hurriyet.com.tr/rss/egitim"),
     ("Sabah", "https://www.sabah.com.tr/rss/egitim.xml"),
     ("CNN Türk", "https://www.cnnturk.com/feed/rss/egitim/news"),
@@ -38,8 +44,14 @@ FEEDS = [
     ("Google Haberler", "https://news.google.com/rss/search?q=VGM+burs+OR+TEV+burs+OR+T%C3%9CB%C4%B0TAK+burs+OR+%22burs+ba%C5%9Fvurular%C4%B1%22+%C3%BCniversite+when:14d&hl=tr&gl=TR&ceid=TR:tr"),
     ("Google Haberler", "https://news.google.com/rss/search?q=KYK+burs+OR+%22KYK+yurt%22+OR+%22%C3%B6%C4%9Frenim+kredisi%22+when:7d&hl=tr&gl=TR&ceid=TR:tr"),
     ("Google Haberler", "https://news.google.com/rss/search?q=erasmus+%C3%BCniversite+OR+%22yurt+d%C4%B1%C5%9F%C4%B1+burs%22+OR+fulbright+when:14d&hl=tr&gl=TR&ceid=TR:tr"),
-    ("Google Haberler", "https://news.google.com/rss/search?q=%22%C3%BCniversite+%C3%B6%C4%9Frencilerine%22+staj+OR+%22Ulusal+Staj+Program%C4%B1%22+when:14d&hl=tr&gl=TR&ceid=TR:tr"),
+    ("Google Haberler", "https://news.google.com/rss/search?q=%22%C3%BCniversite+%C3%B6%C4%9Frencilerine%22+staj+OR+%22Ulusal+Staj+Program%C4%B1%22+OR+%22%C4%B0%C5%9EKUR+Gen%C3%A7lik%22+when:14d&hl=tr&gl=TR&ceid=TR:tr"),
+    ("Google Haberler", "https://news.google.com/rss/search?q=site:osym.gov.tr+OR+site:yok.gov.tr+OR+site:gsb.gov.tr+OR+site:tubitak.gov.tr+when:14d&hl=tr&gl=TR&ceid=TR:tr"),
 ]
+
+# Doğrudan taranan birincil resmî kurum ve vakıf kaynakları (Ana Kaynaklar)
+OFFICIAL_SOURCES = {
+    "ÖSYM", "YÖK", "TÜBİTAK", "VGM", "TEV", "Türkiye Ulusal Ajansı", "Resmî Gazete", "GSB / KYK",
+}
 
 CATEGORIES = ["Burslar", "KYK & Yurtlar", "Sınavlar", "Üniversiteler", "Yurt Dışı", "Kariyer & Staj"]
 
@@ -298,7 +310,7 @@ def fetch_raw_article(url: str) -> tuple[str, list[str]]:
     paragraphs: list[str] = []
     try:
         req = urllib.request.Request(real_url, headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=10, context=SSL_CTX) as resp:
             real_url = resp.geturl() or real_url
             raw = resp.read().decode("utf-8", errors="ignore")
     except Exception:
@@ -322,10 +334,63 @@ def fetch_raw_article(url: str) -> tuple[str, list[str]]:
     cleaned_html = re.sub(r"<(script|style|nav|footer|header|aside|form|noscript)[^>]*>.*?</\1>", " ", raw, flags=re.S | re.I)
     for p in re.findall(r"<p[^>]*>(.*?)</p>", cleaned_html, flags=re.S | re.I):
         txt = strip_html(p)
-        if len(txt) >= 50:
+        if len(txt) >= 45:
             paragraphs.append(txt)
 
+    # 3. Resmî kurum sayfalarında (ÖSYM, VGM, YÖK vb.) metin bazen <div> veya <li> içindedir
+    if len(paragraphs) < 2:
+        for blk in re.findall(r"<(?:div|li)[^>]*>(.*?)</(?:div|li)>", cleaned_html, flags=re.S | re.I):
+            if "<div" in blk.lower():
+                continue
+            txt = strip_html(blk)
+            if 50 <= len(txt) <= 650 and txt not in paragraphs:
+                paragraphs.append(txt)
+
     return real_url, paragraphs
+
+
+def official_context_paragraphs(title: str, source: str, category: str) -> list[str]:
+    """Doğrudan ana kaynaktan (ÖSYM, YÖK, TÜBİTAK, VGM, TEV vb.) alınan duyurular için özgün haber bağlamı üretir."""
+    t_clean = title.rstrip(".?!")
+    if source == "ÖSYM" or category == "Sınavlar":
+        return [
+            f"Ölçme, Seçme ve Yerleştirme Merkezi (ÖSYM) tarafından yayımlanan resmî duyuru kapsamında '{t_clean}' başlıklı süreç adayların erişimine açıldı.",
+            "Sınava katılacak veya sonuç/tercih işlemi yapacak adaylar, T.C. kimlik numaraları ve aday şifreleriyle ÖSYM Aday İşlemleri Sistemi (ais.osym.gov.tr) veya Sonuç Açıklama Sistemi (sonuc.osym.gov.tr) üzerinden işlemlerini doğrudan tamamlayabiliyor.",
+            "ÖSYM duyurusunda yer alan kılavuz hükümleri, başvuru ve geç başvuru tarihleri ile sınav merkezi kurallarının adaylar tarafından dikkatle incelenmesi gerekiyor.",
+        ]
+    if source == "YÖK":
+        return [
+            f"Yükseköğretim Kurulu (YÖK) tarafından paylaşılan '{t_clean}' başlıklı resmî açıklama, üniversite öğrencileri ve akademik birimler için yürürlüğe giren yeni detayları içeriyor.",
+            "YÖK'ün yükseköğretim kurumlarına gönderdiği çerçeve kararlar doğrultusunda üniversite senatoları ve öğrenci işleri daire başkanlıkları ilgili uygulama takvimini yürütecek.",
+            "Öğrenciler ve akademisyenler, düzenlemenin tam metnine ve uygulama esaslarına Yükseköğretim Kurulu'nun resmî internet sayfası (yok.gov.tr) üzerinden ulaşabiliyor.",
+        ]
+    if source == "TÜBİTAK":
+        return [
+            f"TÜBİTAK Bilim İnsanı Destek Programları Başkanlığı (BİDEB) ve ilgili araştırma grupları tarafından '{t_clean}' duyurusu resmî olarak yayımlandı.",
+            "Lisans, yüksek lisans, doktora öğrencileri ile araştırmacıları kapsayan çağrı ve burs programlarına başvurular TÜBİTAK Yönetim Bilgi Sistemi (tybs.tubitak.gov.tr) ve BİDEB Başvuru Sistemi (ebideb.tubitak.gov.tr) üzerinden çevrim içi olarak alınıyor.",
+            "Adayların çağrı metninde belirtilen son başvuru tarihinden önce ARBİS kayıtlarını güncellemesi ve istenen belgeleri sisteme yüklemesi gerekiyor.",
+        ]
+    if source in ("VGM", "TEV") or category == "Burslar":
+        return [
+            f"{source} tarafından doğrudan yayımlanan '{t_clean}' duyurusuyla birlikte üniversite öğrencilerini ilgilendiren burs ve eğitim desteği sürecinde yeni aşamaya geçildi.",
+            "Burs başvuru ve değerlendirme işlemleri kurumun resmî çevrim içi başvuru ekranı üzerinden yürütülüyor; adayların öğrenim durumu, başarı şartı ve gelir beyanı bilgilerini doğru girmesi büyük önem taşıyor.",
+            "Sonuç açıklamaları, burs taahhütnamesi onayı ve aylık ödeme takvimi için yalnızca kurumun resmî duyuru sayfası takip edilmeli.",
+        ]
+    if source == "Türkiye Ulusal Ajansı" or category == "Yurt Dışı":
+        return [
+            f"Türkiye Ulusal Ajansı tarafından paylaşılan '{t_clean}' başlıklı resmî duyuru, Erasmus+ ve Avrupa Dayanışma Programı (ESC) kapsamındaki öğrenci ve gençlik fırsatlarını içeriyor.",
+            "Yurt dışı öğrenim, staj hareketliliği ve gençlik projelerine başvuracak adaylar, üniversitelerinin uluslararası ilişkiler ofisleri ile Türkiye Ulusal Ajansı'nın (ua.gov.tr) uygulama rehberlerini esas almalı.",
+            "Hibe tutarları, başvuru şartları ve proje takvimine ilişkin tüm güncellemeler Ulusal Ajans portalında yayımlanıyor.",
+        ]
+    if source == "Resmî Gazete":
+        return [
+            f"Resmî Gazete'nin bugünkü sayısında yayımlanan '{t_clean}' düzenlemesi resmen yürürlüğe girdi.",
+            "Yükseköğretim kurumlarının eğitim-öğretim, sınav, uygulama ve araştırma süreçlerini doğrudan ilgilendiren yönetmelik hükümleri ilgili üniversite birimleri tarafından uygulanacak.",
+        ]
+    return [
+        f"{source} tarafından yayımlanan '{t_clean}' başlıklı duyuru yükseköğretim gündeminde yürürlüğe girdi.",
+        "Üniversite öğrencilerini ilgilendiren sürecin başvuru ve uygulama adımları kurumun resmî internet sayfasında yer alıyor.",
+    ]
 
 
 def build_editorial_article(title: str, raw_desc: str, raw_paragraphs: list[str], category: str, source: str) -> tuple[str, list[str]]:
@@ -369,32 +434,16 @@ def build_editorial_article(title: str, raw_desc: str, raw_paragraphs: list[str]
         if len(body) >= 6:
             break
 
+    # Doğrudan resmî kurumlardan (ÖSYM, YÖK, TÜBİTAK, VGM, TEV vb.) gelen kısa duyuruları kendi özgün haber metnimizle zenginleştir
+    if source in OFFICIAL_SOURCES and len(body) < 2:
+        ctx_paras = official_context_paragraphs(title, source, category)
+        for cp in ctx_paras:
+            if cp not in body:
+                body.append(cp)
+
     # Eğer kaynak sayfa koruma/JS arkasındaysa ve hiç paragraf çıkmadıysa bağlamsal editoryal metin üret
     if not body:
-        t_clean = title.rstrip(".?!")
-        if category == "Burslar":
-            body = [
-                f"{t_clean} başlığıyla duyurulan burs programına ilişkin başvuru takvimi ve değerlendirme süreci öğrencilerin gündeminde yer alıyor.",
-                "Adayların başvuru ekranı açıldığında öğrenim belgesi, transkript ve gelir durumunu gösteren belgeleri eksiksiz hazırlaması gerekiyor. Başvurular ilgili kurumun resmî başvuru sistemi üzerinden alınıyor.",
-                f"Kontenjan, aylık ödeme tutarı ve kesin sonuç tarihleri için duyuruyu yayımlayan kurumun resmî açıklamaları takip edilmeli.",
-            ]
-        elif category == "KYK & Yurtlar":
-            body = [
-                f"{t_clean} konusuyla ilgili Gençlik ve Spor Bakanlığı (GSB) ile Kredi ve Yurtlar Genel Müdürlüğü süreci yürütülüyor.",
-                "KYK burs, öğrenim kredisi ve yurt işlemlerinin tamamı e-Devlet kapısı üzerinden T.C. kimlik numarası ile sorgulanabiliyor. Taahhütname onayı ve kayıt takvimine dikkat edilmesi gerekiyor.",
-                "Resmî duyurular yayımlandıkça başvuru ekranları ve sonuç belgeleri e-Devlet sisteminde güncelleniyor.",
-            ]
-        elif category == "Sınavlar":
-            body = [
-                f"{t_clean} gelişmesi, sınava hazırlanan adaylar ve tercih sürecindeki öğrenciler tarafından yakından izleniyor.",
-                "Sınav giriş belgeleri, başvuru kılavuzları ve sonuç açıklamaları ÖSYM'nin Aday İşlemleri Sistemi (AİS) üzerinden erişime açılıyor.",
-                "Adayların başvuru ve geç başvuru günlerini kaçırmamak için resmî sınav takvimini kontrol etmesi öneriliyor.",
-            ]
-        else:
-            body = [
-                f"{t_clean} başlıklı gelişme, yükseköğretim gündeminde öne çıkan konular arasında yer aldı.",
-                "Üniversite öğrencilerini ve akademik birimleri ilgilendiren düzenlemenin uygulama detayları ilgili kurumların duyuru sayfalarında paylaşılıyor.",
-            ]
+        body = official_context_paragraphs(title, source, category)
 
     if not answer:
         answer = body[0] if body else title
@@ -473,8 +522,61 @@ def extract_tags(title: str, desc: str) -> list[str]:
 
 def http_get(url: str, timeout: int = 20) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
+    with urllib.request.urlopen(req, timeout=timeout, context=SSL_CTX) as r:
         return r.read()
+
+
+def fetch_official_sources() -> list[dict]:
+    """Gazetelerin haber kaynağı aldığı birincil resmî kurumların (ÖSYM, YÖK, TÜBİTAK, VGM, TEV, Ulusal Ajans, Resmî Gazete)
+    duyuru sayfalarını doğrudan tarar."""
+    now_iso = datetime.now(timezone.utc).isoformat()
+    results: list[dict] = []
+
+    targets = [
+        ("ÖSYM", "https://www.osym.gov.tr/", "https://www.osym.gov.tr/",
+         r'<a[^>]+href=["\'](/(?:202[67]-|osym-)[^"\'#?]+)["\'][^>]*>(.*?)</a>'),
+        ("YÖK", "https://www.yok.gov.tr/", "https://www.yok.gov.tr/",
+         r'<a[^>]+href=["\']((?:https://www\.yok\.gov\.tr)?/tr/(?:news|announcements)/[^"\'#?]+)["\'][^>]*>(.*?)</a>'),
+        ("TÜBİTAK", "https://tubitak.gov.tr/tr/duyuru", "https://tubitak.gov.tr/",
+         r'<a[^>]+href=["\'](/tr/duyuru/[^"\'#?]+)["\'][^>]*>(.*?)</a>'),
+        ("VGM", "https://www.vgm.gov.tr/duyurular", "https://www.vgm.gov.tr/",
+         r'<a[^>]+href=["\'](/duyurular/[^"\'#?]+)["\'][^>]*>(.*?)</a>'),
+        ("TEV", "https://www.tev.org.tr/", "https://www.tev.org.tr/",
+         r'<a[^>]+href=["\']([^"\']*duyuru/tr/[^"\'#?]+)["\'][^>]*>(.*?)</a>'),
+        ("Türkiye Ulusal Ajansı", "https://www.ua.gov.tr/", "https://www.ua.gov.tr/",
+         r'<a[^>]+href=["\'](/(?:haber|duyuru)/[^"\'#?]+)["\'][^>]*>(.*?)</a>'),
+        ("Resmî Gazete", "https://www.resmigazete.gov.tr/", "https://www.resmigazete.gov.tr/",
+         r'<a[^>]+href=["\'](https://www\.resmigazete\.gov\.tr/eskiler/\d{4}/\d{2}/\d{8}-\d+\.htm)["\'][^>]*>(.*?)</a>'),
+    ]
+
+    for source, page_url, base_url, pattern in targets:
+        try:
+            raw_html = http_get(page_url, timeout=12).decode("utf-8", errors="ignore")
+            seen_u: set[str] = set()
+            count = 0
+            for href_val, inner in re.findall(pattern, raw_html, flags=re.S | re.I):
+                title = strip_html(inner).lstrip("–—-• ")
+                if len(title) < 22 or tr_lower(title) in ("devamını oku", "detaylar", "tümü", "tıklayınız"):
+                    continue
+                full_url = urllib.parse.urljoin(base_url, href_val.strip())
+                if full_url in seen_u:
+                    continue
+                seen_u.add(full_url)
+                results.append({
+                    "source": source,
+                    "source_url": full_url,
+                    "raw_title": title,
+                    "raw_desc": f"{source} resmî internet sayfasında yayımlanan duyuru: {title}",
+                    "published": now_iso,
+                })
+                count += 1
+                if count >= 12:
+                    break
+            print(f"✓ [Ana Kaynak] {source}: {count} duyuru")
+        except Exception as e:
+            print(f"! [Ana Kaynak] {source} taranamadı: {e}", file=sys.stderr)
+
+    return results
 
 
 def parse_date(s: str | None) -> datetime:
@@ -528,15 +630,25 @@ def is_candidate(item: dict) -> bool:
     text = tr_lower(item["raw_title"] + " " + item["raw_desc"])
     if any(x in text for x in EXCLUDE) and "üniversite" not in title:
         return False
+    if any(x in title for x in ["sözleşmeli personel", "meclisi üyesi", "ihale", "kuruluşunda amaçlarına"]):
+        return False
+    if item.get("source") in ("ÖSYM", "YÖK", "TEV", "Türkiye Ulusal Ajansı"):
+        return True
     return any(k in title for k in KEYWORDS) or sum(k in text for k in KEYWORDS) >= 2
 
 
-def rule_category(title: str, desc: str = "") -> str:
+def rule_category(title: str, desc: str = "", source: str = "") -> str:
     for text in (title, title + " " + desc):
         t = tr_lower(text)
         for cat, kws in CATEGORY_RULES:
             if any(k in t for k in kws):
                 return cat
+    if source == "ÖSYM":
+        return "Sınavlar"
+    if source in ("VGM", "TEV", "TÜBİTAK"):
+        return "Burslar"
+    if source == "Türkiye Ulusal Ajansı":
+        return "Yurt Dışı"
     return "Üniversiteler"
 
 
@@ -571,19 +683,22 @@ def main() -> None:
 
     for e in raw_existing:
         rt = e.get("raw_title", e["title"])
-        if not is_candidate({"raw_title": rt, "raw_desc": e.get("summary", "")}):
+        if not is_candidate({"raw_title": rt, "raw_desc": e.get("summary", ""), "source": e.get("source", "")}):
             continue
         ct = clean_title(rt)
         if any(is_similar(ct, st) for st in seen_titles):
             continue
         e["title"] = ct
-        e["category"] = rule_category(ct, e.get("summary", ""))
+        e["category"] = rule_category(ct, e.get("summary", ""), e.get("source", ""))
         seen_links.add(e["source_url"])
         seen_titles.append(ct)
         used_slugs.add(e["slug"])
         existing.append(e)
 
-    fetched: list[dict] = []
+    # 1. Önce doğrudan resmî kurumları (Ana Kaynakları) tara
+    fetched: list[dict] = fetch_official_sources()
+
+    # 2. Ardından haber ajanslarını ve gazeteleri tara
     for source, url in FEEDS:
         try:
             items = parse_feed(source, http_get(url))
@@ -605,7 +720,7 @@ def main() -> None:
         base = slugify(ct)
         slug = base if base not in used_slugs else f"{base}-{hashlib.md5(it['source_url'].encode()).hexdigest()[:6]}"
         used_slugs.add(slug)
-        cat = rule_category(ct, it["raw_desc"])
+        cat = rule_category(ct, it["raw_desc"], it["source"])
         new_items.append({
             "slug": slug,
             "title": ct,

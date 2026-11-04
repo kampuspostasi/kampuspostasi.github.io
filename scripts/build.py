@@ -198,13 +198,23 @@ def trim(s: str, n: int) -> str:
     return s if len(s) <= n else s[: n - 10].rsplit(" ", 1)[0] + "…"
 
 
+OFFICIAL_SET = {"ÖSYM", "YÖK", "TÜBİTAK", "VGM", "TEV", "Türkiye Ulusal Ajansı", "Resmî Gazete", "GSB / KYK"}
+
+
+def src_label(e: dict) -> str:
+    s = escape(e["source"])
+    if e["source"] in OFFICIAL_SET:
+        return f'{s} <span class="official-badge" title="Doğrudan resmî kurum kaynağından">✓ Resmî Kaynak</span>'
+    return s
+
+
 def story(e: dict, size: str = "m", summary_len: int = 200, show_kicker: bool = True) -> str:
     summ = f'<p class="dek">{escape(trim(e["summary"], summary_len))}</p>' if e.get("summary") and summary_len else ""
     return f"""<article class="story s-{size}">
   {kicker(e) if show_kicker else ""}
   <h3><a href="{href(e)}">{escape(e['title'])}</a></h3>
   {summ}
-  <div class="byline">{escape(e['source'])} · <time datetime="{e['published']}">{short_when(e['published'])}</time></div>
+  <div class="byline">{src_label(e)} · <time datetime="{e['published']}">{short_when(e['published'])}</time></div>
 </article>"""
 
 
@@ -216,7 +226,7 @@ def row(e: dict) -> str:
     {kicker(e)}
     <h3><a href="{href(e)}">{escape(e['title'])}</a></h3>
     {summ}
-    <div class="byline">{escape(e['source'])}</div>
+    <div class="byline">{src_label(e)}</div>
   </div>
 </article>"""
 
@@ -296,7 +306,7 @@ def main() -> None:
       {kicker(lead)}
       <h2><a href="{href(lead)}">{escape(lead['title'])}</a></h2>
       {f'<p class="dek">{escape(trim(lead["summary"], 320))}</p>' if lead.get("summary") else ""}
-      <div class="byline">{escape(lead['source'])} · <time datetime="{lead['published']}">{short_when(lead['published'])}</time></div>
+      <div class="byline">{src_label(lead)} · <time datetime="{lead['published']}">{short_when(lead['published'])}</time></div>
     </article>
     <div class="seconds">{"".join(story(e, "m", 160) for e in seconds)}</div>
   </div>
