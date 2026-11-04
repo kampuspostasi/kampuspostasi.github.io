@@ -178,6 +178,12 @@ def layout(title: str, body: str, *, desc: str = DESC, path: str = "/", jsonld: 
       setTimeout(()=>{{cp.textContent=orig;}},2000);
     }}).catch(()=>{{}});
   }});
+  try{{
+    const sp=new URLSearchParams(location.search);
+    if(sp.get('admin')==='1')localStorage.setItem('kp_ignore','1');
+    if(sp.get('admin')==='0')localStorage.removeItem('kp_ignore');
+    if(localStorage.getItem('kp_ignore')==='1')return;
+  }}catch(e){{}}
   if(location.hostname!=='kampuspostasi.github.io')return;
   const b='https://abacus.jasoncameron.dev/hit/kampuspostasi/',d=new Date().toISOString().slice(0,10);
   fetch(b+'total_views').catch(()=>{{}});
