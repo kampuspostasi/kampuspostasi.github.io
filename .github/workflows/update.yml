@@ -2,8 +2,11 @@ name: Günlük güncelleme ve yayın
 
 on:
   schedule:
-    - cron: "0 4 * * *"    # her gün 07:00 (Türkiye)
-    - cron: "0 13 * * *"   # her gün 16:00 (Türkiye)
+    - cron: "30 4 * * *"   # 07:30 (Türkiye) - Sabah bülteni
+    - cron: "30 8 * * *"   # 11:30 (Türkiye) - Öğle öncesi
+    - cron: "30 12 * * *"  # 15:30 (Türkiye) - Öğleden sonra (ÖSYM/YÖK duyuru saatleri)
+    - cron: "30 16 * * *"  # 19:30 (Türkiye) - Akşam bülteni
+    - cron: "0 20 * * *"   # 23:00 (Türkiye) - Gece kapanış
   workflow_dispatch:
   push:
     branches: [main]
