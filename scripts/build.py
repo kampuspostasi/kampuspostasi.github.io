@@ -146,7 +146,7 @@ def layout(title: str, body: str, *, desc: str = DESC, path: str = "/", jsonld: 
       <a href="{u('/hakkinda/')}">Künye ve iletişim</a>
       <a href="{u('/ara/')}">Arşivde ara</a>
       <a href="{u('/rss.xml')}">RSS beslemesi</a>
-      <a class="mail-link" data-u="kampuspostasi" data-d="gmail.com" href="{u('/hakkinda/')}">İletişim</a>
+      <a class="mail-link mail-show" data-u="kampuspostasi" data-d="gmail.com" href="{u('/hakkinda/')}">İletişim</a>
     </div>
   </div>
   <div class="wrap copy">© {NOW.year} Kampüs Postası. Başvuru tarihleri ve şartlar için ilgili kurumların resmî duyurularını esas alınız.</div>
