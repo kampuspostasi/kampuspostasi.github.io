@@ -185,7 +185,7 @@ def layout(title: str, body: str, *, desc: str = DESC, path: str = "/", jsonld: 
     if(localStorage.getItem('kp_ignore')==='1')return;
   }}catch(e){{}}
   if(location.hostname!=='kampuspostasi.github.io')return;
-  const b='https://abacus.jasoncameron.dev/hit/kampuspostasi/',d=new Date().toISOString().slice(0,10);
+  const b='https://abacus.jasoncameron.dev/hit/kampuspostasi_v2/',d=new Date().toISOString().slice(0,10);
   fetch(b+'total_views').catch(()=>{{}});
   fetch(b+'views_'+d).catch(()=>{{}});
   try{{
