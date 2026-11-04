@@ -68,7 +68,9 @@ EXCLUDE = [
     "ara tatil", "karne", "ilkokul", "anaokulu", "okul öncesi", "lgs", "ortaokul",
     "ders saati", "cumhuriyet bayramı", "lise öğrencileri", "liselilere", "meslek lisesi",
     "veli", "öğretmen ataması", "bursluluk sınavı", "iokbs", "ilköğretim", "okul çevreleri",
-    "kantin", "servis ücreti",
+    "kantin", "servis ücreti", "ortaöğretim bursu", "şüpheli ölüm", "ölü bulundu",
+    "hayatını kaybetti", "intihar", "cinayet", "tutuklandı", "gözaltına alındı",
+    "bilişim personeli alım", "sözleşmeli personel", "anıldı", "hayvan kurtarma",
 ]
 
 CATEGORY_RULES = [
@@ -226,22 +228,29 @@ def clean_title(raw: str) -> str:
 
 def strip_page_chrome(s: str, title: str) -> str:
     """Kaynak sayfadan sızan 'Ana Sayfa > Kategori > Başlık etiket' kalıntılarını keser."""
-    out = re.sub(r"^(Ana Sayfa|Kaynak Ekle|Anasayfa)\s+", "", s.strip(), flags=re.I)
+    out = s.strip()
+    out = re.sub(r"^.*?\b(Ana Sayfa|Kaynak Ekle|Anasayfa)\b\s*(?:Eğitim\s*(?:&\s*Sağlık)?\s*)?", "", out, flags=re.I)
+    out = re.sub(r"^Yayınlanma:\s*\d{1,2}[./]\d{1,2}[./]\d{4}\s*\d{1,2}:\d{2}\s*", "", out, flags=re.I)
+    out = re.sub(r"^[a-zçğıöşüA-ZÇĞİÖŞÜ\s]+resmî internet sayfasında yayımlanan duyuru:.*?(?=[A-ZÇĞİÖŞÜ0-9]|$)", "", out)
     tl, ol = tr_lower(title.rstrip("…. ")), tr_lower(out)
-    for key in (tl, tl[-35:], tl[:35]):
-        if len(key) >= 18:
+    for key in (tl, tl[-35:]):
+        if len(key) >= 22:
             pos = ol.find(key)
-            if 0 <= pos < 260 and len(out) - (pos + len(key)) > 40:
-                out = out[pos + len(key):].lstrip(" :!?.-–")
+            end = pos + len(key)
+            if 0 <= pos < 220 and len(out) - end > 40 and (end >= len(out) or not out[end].isalnum()):
+                out = out[end:].lstrip(" :!?.-–—•")
                 break
-    # Başta kalan "Başvurular Başladı burs " veya tek kelimelik etiketleri temizle
+    out = re.sub(r"^[\-–—•]+\s*", "", out)
+    out = re.sub(r"\s+[\-–—•]+\s*(?=[A-ZÇĞİÖŞÜ“\"])", ". ", out)
+    # Başta kalan kesik ek veya tek kelimelik etiketleri temizle
+    out = re.sub(r"^(Nde|İnde|Ünde|Dan|Den|Nin|Nın|Av Günü [^\n.]{5,50}|İtiminde [^\n.]{5,50}|Li [^\n.]{5,45}!)\s*", "", out)
     out = re.sub(r"^(başvuruları?\s+başladı!?\.?\s+)?(burs|haber|eğitim|üniversite)\s+(?=[A-ZÇĞİÖŞÜ0-9])", "", out, flags=re.I)
     out = re.sub(r"^Binlerce Öğrencinin Beklediği [^\n.]{5,50} İçin\s+", "", out)
-    return tr_capitalize(out.strip())
+    return tr_capitalize(out.strip(" -–—•"))
 
 
 def paraphrase_sentence(s: str) -> str:
-    out = s.strip()
+    out = s.strip(" -–—•")
     # Başlangıçtaki breadcrumb/kategori veya satır içi reklam kalıntılarını temizle
     out = re.sub(r"^Ana Sayfa\s+[^\n.]{5,90}\b(burs|haber|eğitim)\s+", "", out, flags=re.I)
     out = re.sub(r"^[A-ZÇĞİÖŞÜ][a-zçğıöşü]+\s+burs\s+başvuruları\s+(?=[A-ZÇĞİÖŞÜ])", "", out)
@@ -251,13 +260,15 @@ def paraphrase_sentence(s: str) -> str:
         return ""
     for pat, repl in REWRITE_MAP:
         out = re.sub(pat, repl, out, flags=re.I)
-    out = re.sub(r"\s+", " ", out).strip()
+    out = re.sub(r"\s+", " ", out).strip(" -–—•")
     return tr_capitalize(out) if out else ""
 
 
 def is_seo_spam_sentence(s: str) -> bool:
     sl = tr_lower(s)
     if len(s) < 35:
+        return True
+    if "resmî internet sayfasında yayımlanan duyuru:" in sl:
         return True
     if any(j in sl for j in JUNK_PHRASES):
         return True
@@ -566,7 +577,7 @@ def fetch_official_sources() -> list[dict]:
                     "source": source,
                     "source_url": full_url,
                     "raw_title": title,
-                    "raw_desc": f"{source} resmî internet sayfasında yayımlanan duyuru: {title}",
+                    "raw_desc": "",
                     "published": now_iso,
                 })
                 count += 1

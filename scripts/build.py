@@ -110,14 +110,14 @@ def layout(title: str, body: str, *, desc: str = DESC, path: str = "/", jsonld: 
 </head>
 <body>
 <div class="strip"><div class="wrap">
-  <span class="strip-l"><span class="hide-sm">{GUNLER[NOW.weekday()]}, {long_date(NOW)} · </span><span class="live-pill"><b class="live-dot">●</b> Son güncelleme: {NOW:%H:%M}</span></span>
+  <span class="strip-l">{GUNLER[NOW.weekday()]}, {long_date(NOW)}</span>
   <div class="strip-r">
     <form class="quick-search" action="{u('/ara/')}" method="get">
-      <input type="search" name="q" placeholder="Burs, KYK, sınav ara…" aria-label="Arşivde ara">
+      <input type="search" name="q" placeholder="Arşivde ara…" aria-label="Arşivde ara">
     </form>
-    <a href="{u('/rss.xml')}" class="hide-sm">RSS</a>
+    <a href="{u('/arsiv/')}" class="hide-sm">Arşiv</a>
     <a href="{u('/hakkinda/')}" class="hide-sm">Künye</a>
-    <button id="theme-btn" class="theme-btn" type="button" aria-label="Gece/Gündüz modu">🌙 Gece</button>
+    <button id="theme-btn" class="theme-btn" type="button" aria-label="Görünüm değiştir">Gece</button>
   </div>
 </div></div>
 <header class="masthead">
@@ -156,7 +156,7 @@ def layout(title: str, body: str, *, desc: str = DESC, path: str = "/", jsonld: 
   function syncBtn(){{
     if(!btn)return;
     const dark=document.documentElement.getAttribute('data-theme')==='dark';
-    btn.textContent=dark?'☀️ Gündüz':'🌙 Gece';
+    btn.textContent=dark?'Gündüz':'Gece';
   }}
   syncBtn();
   if(btn)btn.addEventListener('click',()=>{{
@@ -168,7 +168,7 @@ def layout(title: str, body: str, *, desc: str = DESC, path: str = "/", jsonld: 
   const cp=document.getElementById('copy-link');
   if(cp)cp.addEventListener('click',()=>{{
     navigator.clipboard.writeText(location.href).then(()=>{{
-      const orig=cp.textContent;cp.textContent='✓ Kopyalandı';
+      const orig=cp.textContent;cp.textContent='Kopyalandı';
       setTimeout(()=>{{cp.textContent=orig;}},2000);
     }}).catch(()=>{{}});
   }});
@@ -198,14 +198,8 @@ def trim(s: str, n: int) -> str:
     return s if len(s) <= n else s[: n - 10].rsplit(" ", 1)[0] + "…"
 
 
-OFFICIAL_SET = {"ÖSYM", "YÖK", "TÜBİTAK", "VGM", "TEV", "Türkiye Ulusal Ajansı", "Resmî Gazete", "GSB / KYK"}
-
-
 def src_label(e: dict) -> str:
-    s = escape(e["source"])
-    if e["source"] in OFFICIAL_SET:
-        return f'{s} <span class="official-badge" title="Doğrudan resmî kurum kaynağından">✓ Resmî Kaynak</span>'
-    return s
+    return escape(e["source"])
 
 
 def story(e: dict, size: str = "m", summary_len: int = 200, show_kicker: bool = True) -> str:
@@ -263,7 +257,7 @@ def sidebar(items: list[dict], exclude: str = "") -> str:
         for n, (s, _) in CATS.items() if n != exclude
     )
     return f"""<aside class="side">
-  <section class="radar-box"><h4 class="label">📌 Burs &amp; Sınav Radarı</h4><ul class="radar-list">{radar_html}</ul></section>
+  <section class="radar-box"><h4 class="label">Burs ve Sınav Gündemi</h4><ul class="radar-list">{radar_html}</ul></section>
   <section><h4 class="label">Son Dakika</h4><ol class="ticker">{latest}</ol></section>
   <section><h4 class="label">Bölümler</h4><ul class="seclist">{secs}</ul></section>
 </aside>"""
@@ -442,6 +436,45 @@ ve burs veren kurumların resmî duyurularını kontrol etmenizi öneririz.</p>
     write("/404.html", layout("Sayfa bulunamadı", f'<div class="empty"><h1>Aradığınız sayfa bulunamadı</h1><p><a href="{u("/")}">Ana sayfaya dönün</a> ya da <a href="{u("/ara/")}">arşivde arayın</a>.</p></div>', path="/404.html"))
 
     # ---------------- RSS / Sitemap / robots
+    rss_xsl = f"""<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output method="html" encoding="UTF-8"/>
+<xsl:template match="/rss/channel">
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title><xsl:value-of select="title"/> — RSS Akışı</title>
+<link rel="stylesheet" href="{u('/assets/style.css')}"/>
+</head>
+<body>
+<header class="masthead"><div class="wrap">
+  <a class="brand" href="{u('/')}">Kampüs <i>Postası</i></a>
+  <div class="motto">RSS Haber Akışı</div>
+</div></header>
+<main class="wrap" style="max-width:820px;margin-top:24px">
+  <p class="dek" style="padding:14px 16px;background:var(--card);border:1px solid var(--rule);margin-bottom:24px">
+    Bu sayfa <b>Kampüs Postası</b>'nın otomatik RSS beslemesidir. Haber okuyucu uygulamalarınıza (Feedly, NetNewsWire vb.)
+    <code>{abs_u('/rss.xml')}</code> adresini ekleyerek yeni haberleri anında takip edebilir veya aşağıdaki son başlıkları doğrudan okuyabilirsiniz.
+  </p>
+  <div class="list">
+    <xsl:for-each select="item">
+      <article class="row" style="grid-template-columns:1fr">
+        <div class="row-body">
+          <span class="kicker"><xsl:value-of select="category"/></span>
+          <h3><a><xsl:attribute name="href"><xsl:value-of select="link"/></xsl:attribute><xsl:value-of select="title"/></a></h3>
+          <p class="dek"><xsl:value-of select="description"/></p>
+        </div>
+      </article>
+    </xsl:for-each>
+  </div>
+</main>
+</body>
+</html>
+</xsl:template>
+</xsl:stylesheet>"""
+    (OUT / "rss.xsl").write_text(rss_xsl, "utf-8")
     rss_items = "".join(
         f"<item><title>{escape(e['title'])}</title><link>{abs_u(href(e)[len(BASE_PATH):])}</link>"
         f"<guid>{abs_u(href(e)[len(BASE_PATH):])}</guid><category>{escape(e['category'])}</category>"
@@ -450,7 +483,8 @@ ve burs veren kurumların resmî duyurularını kontrol etmenizi öneririz.</p>
         for e in items[:50]
     )
     (OUT / "rss.xml").write_text(
-        f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>{SITE_NAME}</title>'
+        f'<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="{u("/rss.xsl")}"?>'
+        f'<rss version="2.0"><channel><title>{SITE_NAME}</title>'
         f'<link>{abs_u("/")}</link><description>{escape(DESC)}</description><language>tr</language>{rss_items}</channel></rss>', "utf-8")
     urls = ["/", "/arsiv/", "/hakkinda/"] + [f"/kategori/{s}/" for s, _ in CATS.values()] + [f"/haber/{e['slug']}/" for e in items]
     (OUT / "sitemap.xml").write_text(
