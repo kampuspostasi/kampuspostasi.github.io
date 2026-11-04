@@ -8,6 +8,7 @@ import shutil
 from datetime import datetime, timezone, timedelta
 from html import escape
 from pathlib import Path
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "_site"
@@ -101,13 +102,23 @@ def layout(title: str, body: str, *, desc: str = DESC, path: str = "/", jsonld: 
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{u('/assets/style.css')}">
+<script>
+(function(){{try{{var t=localStorage.getItem('kp_theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.setAttribute('data-theme','dark');}}catch(e){{}}}})();
+</script>
 {ads}
 {jsonld}
 </head>
 <body>
 <div class="strip"><div class="wrap">
-  <span>{GUNLER[NOW.weekday()]}, {long_date(NOW)}</span>
-  <span class="strip-r"><a href="{u('/ara/')}">Arama</a><a href="{u('/rss.xml')}">RSS</a><a href="{u('/hakkinda/')}">Künye</a></span>
+  <span class="strip-l"><span class="hide-sm">{GUNLER[NOW.weekday()]}, {long_date(NOW)} · </span><span class="live-pill"><b class="live-dot">●</b> Son güncelleme: {NOW:%H:%M}</span></span>
+  <div class="strip-r">
+    <form class="quick-search" action="{u('/ara/')}" method="get">
+      <input type="search" name="q" placeholder="Burs, KYK, sınav ara…" aria-label="Arşivde ara">
+    </form>
+    <a href="{u('/rss.xml')}" class="hide-sm">RSS</a>
+    <a href="{u('/hakkinda/')}" class="hide-sm">Künye</a>
+    <button id="theme-btn" class="theme-btn" type="button" aria-label="Gece/Gündüz modu">🌙 Gece</button>
+  </div>
 </div></div>
 <header class="masthead">
   <div class="wrap">
@@ -141,6 +152,26 @@ def layout(title: str, body: str, *, desc: str = DESC, path: str = "/", jsonld: 
 </footer>
 <script>
 (function(){{
+  const btn=document.getElementById('theme-btn');
+  function syncBtn(){{
+    if(!btn)return;
+    const dark=document.documentElement.getAttribute('data-theme')==='dark';
+    btn.textContent=dark?'☀️ Gündüz':'🌙 Gece';
+  }}
+  syncBtn();
+  if(btn)btn.addEventListener('click',()=>{{
+    const dark=document.documentElement.getAttribute('data-theme')==='dark';
+    if(dark){{document.documentElement.removeAttribute('data-theme');try{{localStorage.setItem('kp_theme','light');}}catch(e){{}}}}
+    else{{document.documentElement.setAttribute('data-theme','dark');try{{localStorage.setItem('kp_theme','dark');}}catch(e){{}}}}
+    syncBtn();
+  }});
+  const cp=document.getElementById('copy-link');
+  if(cp)cp.addEventListener('click',()=>{{
+    navigator.clipboard.writeText(location.href).then(()=>{{
+      const orig=cp.textContent;cp.textContent='✓ Kopyalandı';
+      setTimeout(()=>{{cp.textContent=orig;}},2000);
+    }}).catch(()=>{{}});
+  }});
   if(location.hostname!=='kampuspostasi.github.io')return;
   const b='https://abacus.jasoncameron.dev/hit/kampuspostasi/',d=new Date().toISOString().slice(0,10);
   fetch(b+'total_views').catch(()=>{{}});
@@ -200,6 +231,19 @@ def pager(base: str, page: int, pages: int) -> str:
 
 
 def sidebar(items: list[dict], exclude: str = "") -> str:
+    radar_Pool = [
+        e for e in items
+        if e["category"] in ("Burslar", "KYK & Yurtlar", "Sınavlar", "Yurt Dışı")
+        and any(k in (e["title"] + " " + e.get("summary", "")).lower()
+                for k in ("başvuru", "sonuç", "takvim", "tarih", "burs", "kredi", "yurt", "sınav", "erasmus"))
+    ][:4]
+    if not radar_Pool:
+        radar_Pool = items[:4]
+    radar_html = "".join(
+        f'<li><span class="r-badge">{escape(e["category"].split()[0])}</span>'
+        f'<a href="{href(e)}">{escape(e["title"])}</a></li>'
+        for e in radar_Pool
+    )
     latest = "".join(
         f'<li><time>{short_when(e["published"])}</time><a href="{href(e)}">{escape(e["title"])}</a></li>'
         for e in items[:10]
@@ -209,6 +253,7 @@ def sidebar(items: list[dict], exclude: str = "") -> str:
         for n, (s, _) in CATS.items() if n != exclude
     )
     return f"""<aside class="side">
+  <section class="radar-box"><h4 class="label">📌 Burs &amp; Sınav Radarı</h4><ul class="radar-list">{radar_html}</ul></section>
   <section><h4 class="label">Son Dakika</h4><ol class="ticker">{latest}</ol></section>
   <section><h4 class="label">Bölümler</h4><ul class="seclist">{secs}</ul></section>
 </aside>"""
@@ -316,6 +361,17 @@ def main() -> None:
                  + "".join(f"<p>{escape(p)}</p>" for p in details) + "</div>") if details else ""
         rel = "".join(
             f'<li><a href="{href(r)}">{escape(r["title"])}</a><time>{short_when(r["published"])}</time></li>' for r in related)
+        full_url = abs_u(path)
+        wa_text = quote(f"{e['title']} — {full_url}")
+        tg_url = f"https://t.me/share/url?url={quote(full_url)}&text={quote(e['title'])}"
+        tw_url = f"https://twitter.com/intent/tweet?url={quote(full_url)}&text={quote(e['title'])}"
+        share_bar = f"""<div class="share-bar">
+  <span class="share-label">Arkadaşına gönder:</span>
+  <a class="share-btn share-wa" href="https://api.whatsapp.com/send?text={wa_text}" target="_blank" rel="noopener">WhatsApp</a>
+  <a class="share-btn share-tg" href="{tg_url}" target="_blank" rel="noopener">Telegram</a>
+  <a class="share-btn" href="{tw_url}" target="_blank" rel="noopener">X</a>
+  <button id="copy-link" class="share-btn" type="button">Bağlantıyı Kopyala</button>
+</div>"""
         body = f"""<div class="two-col article-wrap">
 <article class="article">
   {kicker(e)}
@@ -326,6 +382,7 @@ def main() -> None:
   </div>
   {lede}
   {prose}
+  {share_bar}
   <div class="tags">{tags}</div>
   <p class="disclaimer">Kaynak: <a href="{escape(e['source_url'])}" target="_blank" rel="noopener nofollow">{escape(e['source'])}</a> · Başvuru tarihleri, şartlar ve sonuçlar için ilgili kurumun resmî duyurusunu esas alınız.</p>
   {f'<section class="related"><h4 class="label">Bu bölümden</h4><ul>{rel}</ul></section>' if rel else ""}

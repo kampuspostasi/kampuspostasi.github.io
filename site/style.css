@@ -1,18 +1,29 @@
 :root{
   --paper:#fbfaf6;--ink:#141414;--ink2:#3d3d3d;--muted:#6f6b63;--rule:#d9d4c7;--rule-dark:#141414;
-  --red:#b0161e;--serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --red:#b0161e;--card:#f3efe6;--serif:"Source Serif 4",Georgia,"Times New Roman",serif;
   --sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+[data-theme="dark"]{
+  --paper:#121211;--ink:#eceae4;--ink2:#c2beb4;--muted:#8e897f;--rule:#2b2a27;--rule-dark:#eceae4;
+  --red:#e54d54;--card:#1b1a18;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 var(--sans);text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 var(--sans);text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;transition:background .15s,color .15s}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
 
 /* üst şerit */
 .strip{border-bottom:1px solid var(--rule);font-size:12.5px;color:var(--muted)}
-.strip .wrap{display:flex;justify-content:space-between;height:34px;align-items:center}
-.strip-r a{margin-left:18px}.strip-r a:hover{color:var(--ink)}
+.strip .wrap{display:flex;justify-content:space-between;min-height:38px;align-items:center;gap:12px}
+.strip-l{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.live-dot{color:#1b9e4b;font-size:10px;margin-right:3px;vertical-align:middle}
+.strip-r{display:flex;align-items:center;gap:14px}
+.strip-r a:hover{color:var(--ink)}
+.quick-search input{background:var(--card);color:var(--ink);border:1px solid var(--rule);border-radius:3px;padding:4px 9px;font:12.5px var(--sans);width:175px;outline:none;transition:border-color .15s,width .15s}
+.quick-search input:focus{border-color:var(--ink);width:210px}
+.theme-btn{background:var(--card);color:var(--ink);border:1px solid var(--rule);border-radius:3px;padding:3px 9px;font:500 12px var(--sans);cursor:pointer}
+.theme-btn:hover{border-color:var(--ink)}
 
 /* logo alanı */
 .masthead{text-align:center;padding:26px 0 14px}
@@ -53,7 +64,14 @@ a{color:inherit;text-decoration:none}
 .s-s .kicker{margin-bottom:3px}
 
 /* sağ kolon */
-.side section+section{margin-top:30px}
+.side section+section{margin-top:28px}
+.radar-box{background:var(--card);border:1px solid var(--rule);border-top:2px solid var(--red);padding:12px 14px}
+.radar-box .label{border-top:0;padding-top:0;margin-bottom:8px;color:var(--red)}
+.radar-list{list-style:none;margin:0;padding:0}
+.radar-list li{padding:7px 0;border-bottom:1px dotted var(--rule);font-size:13.8px;line-height:1.35}
+.radar-list li:last-child{border-bottom:0;padding-bottom:2px}
+.radar-list a:hover{text-decoration:underline}
+.r-badge{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;background:var(--red);color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px;vertical-align:middle}
 .ticker{list-style:none;margin:0;padding:0}
 .ticker li{display:grid;grid-template-columns:44px 1fr;gap:8px;padding:9px 0;border-bottom:1px dotted var(--rule);font-size:14.5px;line-height:1.35}
 .ticker time{font-size:12px;color:var(--red);font-weight:600;padding-top:2px}
@@ -101,6 +119,14 @@ a{color:inherit;text-decoration:none}
 .tags{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0}
 .tag{font-size:12.5px;color:var(--ink2);border:1px solid var(--rule);padding:2px 9px}
 .tag:hover{border-color:var(--ink)}
+.share-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:24px 0 18px;padding:12px 14px;background:var(--card);border:1px solid var(--rule);border-radius:4px}
+.share-label{font-size:12.5px;font-weight:600;color:var(--muted);margin-right:4px}
+.share-btn{display:inline-flex;align-items:center;padding:5px 11px;font:600 12.5px var(--sans);border:1px solid var(--rule);border-radius:3px;background:var(--paper);color:var(--ink);cursor:pointer}
+.share-btn:hover{border-color:var(--ink)}
+.share-wa{background:#1b873f;color:#fff;border-color:#1b873f}
+.share-wa:hover{opacity:.9;border-color:#1b873f}
+.share-tg{background:#1d80be;color:#fff;border-color:#1d80be}
+.share-tg:hover{opacity:.9;border-color:#1d80be}
 .disclaimer{font-size:13px;color:var(--muted);font-style:italic;border-left:2px solid var(--rule);padding-left:12px}
 .related{margin-top:36px}
 .related ul{list-style:none;margin:0;padding:0}
@@ -108,7 +134,7 @@ a{color:inherit;text-decoration:none}
 .related time{font-family:var(--sans);font-size:12px;color:var(--muted);white-space:nowrap;padding-top:4px}
 
 /* diğer */
-.bigsearch{width:100%;padding:14px 4px;font:400 24px var(--serif);border:0;border-bottom:2px solid var(--ink);background:transparent;outline:none;margin:20px 0 8px}
+.bigsearch{width:100%;padding:14px 4px;font:400 24px var(--serif);border:0;border-bottom:2px solid var(--ink);background:transparent;color:var(--ink);outline:none;margin:20px 0 8px}
 .muted{color:var(--muted);font-size:14px}
 .empty{text-align:center;padding:70px 20px}
 .empty h1{font-family:var(--serif)}
@@ -125,15 +151,17 @@ a{color:inherit;text-decoration:none}
 
 @media (max-width:1050px){
   .front{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
-  .front .side{display:none}
+  .front .side{grid-column:1/-1;border-left:0!important;padding:24px 0 0!important;margin-top:24px;border-top:1px solid var(--rule)}
   .block-grid{grid-template-columns:repeat(2,1fr);row-gap:22px}
   .block-grid .story{padding:0 18px!important}
   .block-grid .story:nth-child(odd){padding-left:0!important;border-left:0!important}
-  .two-col{grid-template-columns:1fr}
-  .two-col .side{display:none}
+  .two-col{grid-template-columns:1fr;gap:32px}
 }
 @media (max-width:700px){
   .wrap{padding:0 16px}
+  .hide-sm{display:none}
+  .quick-search input{width:135px}
+  .quick-search input:focus{width:155px}
   .sections .wrap{justify-content:flex-start}
   .front{grid-template-columns:1fr}
   .front>*{padding:0!important;border-left:0!important}
@@ -144,5 +172,4 @@ a{color:inherit;text-decoration:none}
   .block-grid .story{padding:12px 0!important;border-left:0!important;border-bottom:1px solid var(--rule)}
   .row{grid-template-columns:1fr;gap:2px}
   .foot-grid{grid-template-columns:1fr;gap:24px}
-  .strip-r a:not(:first-child){display:none}
 }
