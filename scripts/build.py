@@ -146,12 +146,18 @@ def layout(title: str, body: str, *, desc: str = DESC, path: str = "/", jsonld: 
       <a href="{u('/hakkinda/')}">Künye ve iletişim</a>
       <a href="{u('/ara/')}">Arşivde ara</a>
       <a href="{u('/rss.xml')}">RSS beslemesi</a>
+      <a class="mail-link" data-u="kampuspostasi" data-d="gmail.com" href="{u('/hakkinda/')}">İletişim</a>
     </div>
   </div>
   <div class="wrap copy">© {NOW.year} Kampüs Postası. Başvuru tarihleri ve şartlar için ilgili kurumların resmî duyurularını esas alınız.</div>
 </footer>
 <script>
 (function(){{
+  document.querySelectorAll('.mail-link').forEach(el=>{{
+    const m=el.getAttribute('data-u')+'@'+el.getAttribute('data-d');
+    el.href='mailto:'+m;
+    if(el.classList.contains('mail-show'))el.textContent=m;
+  }});
   const btn=document.getElementById('theme-btn');
   function syncBtn(){{
     if(!btn)return;
@@ -430,7 +436,9 @@ haberin tam metni ve görselleri ilgili yayın kuruluşuna aittir.</p>
 <p>Başvuru tarihleri, şartlar ve sonuçlar değişebilir. Karar vermeden önce ÖSYM, YÖK, GSB/KYK, üniversiteler
 ve burs veren kurumların resmî duyurularını kontrol etmenizi öneririz.</p>
 <h3>İletişim ve içerik kaldırma</h3>
-<p>Düzeltme talepleri, haber önerileri ve telif bildirimleri için bize GitHub üzerinden ulaşabilirsiniz.</p>
+<p>Düzeltme talepleri, haber ve burs duyurusu önerileri ile telif bildirimleri için bize doğrudan
+<b><a class="mail-link mail-show" data-u="kampuspostasi" data-d="gmail.com" href="#">e-posta</a></b>
+adresimizden ulaşabilirsiniz.</p>
 </div></article>{sidebar(items)}</div>""", path="/hakkinda/"))
 
     write("/404.html", layout("Sayfa bulunamadı", f'<div class="empty"><h1>Aradığınız sayfa bulunamadı</h1><p><a href="{u("/")}">Ana sayfaya dönün</a> ya da <a href="{u("/ara/")}">arşivde arayın</a>.</p></div>', path="/404.html"))
