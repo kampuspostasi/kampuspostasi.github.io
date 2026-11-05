@@ -118,22 +118,45 @@ JUNK_PHRASES = [
     "kopyalanamaz", "izinsiz kullanılamaz", "aa / ", "iha / ", "dha / ",
     "paylaş yorumlar", "google algoritmasına", "tercih edilen kaynak", "aşağıdaki e-posta",
     "sonraki haber", "önceki haber", "yazı boyutu", "haberi paylaş",
+    "mevlana bulvarı", "çankaya / ankara", "merkezi başkanlığı", "aşağıdaki linkten",
+    "aşağıdaki bağlantı", "aşağıda sunulan", "detaylı bilgi için:", "hakkında bilgi:",
+    "detaylar için tıklayın", "tıklayınız", "kategorimizden inceleyebilirsiniz",
+    "kategorisinden inceleyebilirsiniz", "kategorimizi takip edebilirsiniz",
+    "okur temsilcimize ulaşabilirsiniz", "web sitemizde burslar sayfasından",
+    "obigenç", "app store", "google play", "tev.org.tr/", "(% 10)",
+    "sözlerini şöyle sürdürdü", "şunları kaydetti", "şöyle konuştu",
+    "konusuyla ilgili gençlik ve spor bakanlığı",
+    "duyurusu resmî olarak yayımlandı", "süreç adayların erişimine açıldı",
+    "yükseköğretim gündeminde yürürlüğe girdi", "şer'iyye vekâleti",
+    "vakıflarla ilgili konulara gelince", "vakfedenin şartı", "iyilik ve takvada",
+    "medeniyetimizdeki vakıf anlayışı", "sosyal medya hesaplarını takip edebilirsiniz",
 ]
 
-# Editoryal yeniden yazım dönüşüm sözlüğü (kaynak cümle kalıplarını özgünleştirir)
+# Editoryal yeniden yazım dönüşüm sözlüğü (doğal ve akıcı, ne çok resmi ne lakayt ton)
 REWRITE_MAP = [
+    (r"\bgerçekleştirilmesi gerekmektedir\b", "yapılması gerekiyor"),
     (r"\bgerçekleştirilecek\b", "yapılacak"),
     (r"\bgerçekleştirildi\b", "tamamlandı"),
     (r"\bgerçekleştirilen\b", "düzenlenen"),
+    (r"\berişime açılmıştır\b", "yayımlandı"),
     (r"\berişime açıldı\b", "yayımlandı"),
     (r"\berişime sunuldu\b", "açıklandı"),
+    (r"\btamamlanmıştır\b", "tamamlandı"),
+    (r"\bbaşlatılmıştır\b", "başladı"),
+    (r"\byayımlanmıştır\b", "yayımlandı"),
+    (r"\bduyurulmuştur\b", "duyuruldu"),
+    (r"\bbelirtilmiştir\b", "belirtildi"),
+    (r"\bbildirilmiştir\b", "bildirildi"),
+    (r"\bsunulmaktadır\b", "sunuluyor"),
+    (r"\bulaşılmaktadır\b", "ulaşılabiliyor"),
+    (r"\bdüzenlenecektir\b", "düzenlenecek"),
     (r"\bbaşvuruda bulunmak isteyen adayların\b", "başvuracak öğrencilerin"),
     (r"\bbaşvuruda bulunacak adayların\b", "başvuru yapacak adayların"),
     (r"\bbaşvuruda bulunabilir\b", "başvurabilir"),
     (r"\bbaşvuru yapmayı düşünen adayların\b", "başvurmayı planlayan öğrencilerin"),
     (r"\böğrenim gören\b", "okuyan"),
     (r"\bönem taşıyor\b", "gerekiyor"),
-    (r"\bönem taşımaktadır\b", "kritik görülüyor"),
+    (r"\bönem taşımaktadır\b", "önemli görülüyor"),
     (r"\bdikkat çekiyor\b", "öne çıkıyor"),
     (r"\besas alınmalıdır\b", "dikkate alınmalı"),
     (r"\besas alınacak\b", "geçerli olacak"),
@@ -148,9 +171,30 @@ REWRITE_MAP = [
     (r"\bresmi internet sitesinde\b", "resmî sayfasında"),
     (r"\bmerakla beklenen\b", "beklenen"),
     (r"\byoğun ilgi gören\b", "ilgi gören"),
-    (r"\bgözler [a-zçğıöşü\s]+ çevrildi\.?", ""),
-    (r"\bgeri sayım başladı!?\.?", ""),
+    (r"\bardından gözler [a-zçğıöşüA-ZÇĞİÖŞÜ\s]+? çevrildi\b", "ardından sonuçların açıklanması bekleniyor"),
+    (r"\bgözler [a-zçğıöşüA-ZÇĞİÖŞÜ\s]+? çevrildi\b", "süreç yakından takip ediliyor"),
+    (r"\biçin geri sayım başladı!?\.?", "için bekleyiş sürüyor"),
+    (r"\bgeri sayım başladı!?\.?", "bekleyiş sürüyor"),
 ]
+
+ACRONYMS = ["KYK", "YKS", "ÖSYM", "YÖK", "KPSS", "ALES", "YDS", "YÖKDİL", "DGS", "VGM", "TEV", "GSB", "TÜBİTAK", "İBB", "AÖF", "DHBT", "TDK", "MEV", "İŞKUR", "DUS", "STS", "TUS", "EUS", "ÖZYES", "DAAD", "ARIS", "STAR", "KA131", "KA120", "KA210", "KA220", "KA240", "UNESCO", "KBÜ", "BŞEÜ", "GAÜN", "BANÜ", "BUÜ", "OMÜ", "GRÜ", "ODTÜ", "TENMAK", "SAYZEK", "ŞEKAV", "TADER", "NİVAK", "YUVA", "YKDS"]
+
+SPECIFIC_ENTITIES = (
+    "kyk", "vgm", "vakıflar", "yks", "ösym", "yök", "kpss", "ales", "yds", "yökdil",
+    "dgs", "tus", "dus", "dhbt", "tübitak", "tev", "ibb", "işkur", "erasmus", "aöf",
+    "tdk", "mev", "tenmak", "sayzek", "şekav", "tader", "nivak", "odtü", "istanbul",
+)
+
+DANGLING_ENDINGS = (
+    "için", "ardından", "sonra", "önce", "göre", "ile", "olarak", "üzere", "birlikte",
+    "beraber", "rağmen", "karşı", "doğru", "kadar", "eden", "olan", "yapan", "gelen",
+    "alan", "veren", "belirten", "ifade eden", "işaret eden", "dikkat çeken", "vurgulayan",
+    "söyleyen", "kaydeden", "aktaran", "arasında", "kapsamında", "tarafından", "üzerinden",
+    "nedeniyle", "dolayı", "hakkında", "ilişkin", "yönelik", "ait", "dair", "ve", "veya",
+    "ya da", "ancak", "fakat", "ama", "çünkü", "ki", "de", "da", "ise", "şöyle", "şunları",
+    "dr", "prof", "doç", "sayın", "av", "öğr", "gör", "arş", "uzm", "no", "tc", "c",
+    "başvur", "devam", "başta", "özellikle", "örneğin", "hazırlık",
+)
 
 
 def tr_lower(s: str) -> str:
@@ -198,88 +242,335 @@ def is_similar(t1: str, t2: str) -> bool:
     return inter >= 3 and inter / min(len(s1), len(s2)) >= 0.65
 
 
+def fix_acronyms(s: str) -> str:
+    out = s
+    for acr in ACRONYMS:
+        out = re.sub(rf"(?<![.\w/]){tr_lower(acr)}(?![.\w])", acr, out, flags=re.I)
+    out = re.sub(r"\be-devlet\b", "e-Devlet", out, flags=re.I)
+    out = re.sub(r"(?<![.\w])(?:e-yds|eyds)(?![.\w])", "e-YDS", out, flags=re.I)
+    out = re.sub(r"\berasmus\+", "Erasmus+", out, flags=re.I)
+    return out
+
+
 def clean_title(raw: str) -> str:
-    t = raw.strip()
-    t = re.sub(r"^(son dakika\.{0,3}|flaş\.{0,3})\s*[:\-!]?\s*", "", t, flags=re.I)
+    t = html.unescape(raw.strip())
+    # Yazım hataları ve bitişik yazımları düzelt
+    t = re.sub(r"\bsonucları\b", "sonuçları", t, flags=re.I)
+    t = re.sub(r"\bacıklandı\b", "açıklandı", t, flags=re.I)
+    t = re.sub(r"\bacıklanacak\b|\baçıklancak\b", "açıklanacak", t, flags=re.I)
+    t = re.sub(r"\b2026(YKS|KPSS|ALES|DGS|TUS|DUS)\b", r"2026 \1", t, flags=re.I)
+    t = re.sub(r"\bYÖK['’]den\b", "YÖK'ten", t, flags=re.I)
+    t = re.sub(r"/burs\b", "/ Burs", t)
+    t = re.sub(r"\s+I\s+(?=[A-ZÇĞİÖŞÜ])", ": ", t)
+
+    # Ulusal Ajans, VGM ve dış site kart kuyruklarını temizle
+    t = re.sub(r"\s*-->\s*\d{2}\.\d{2}\.\d{4}.*$", "", t)
+    t = re.sub(r"\s+-\s+https?://\S+.*$", "", t)
+    t = re.sub(r"\s+-\s+Dünyanın En Büyük.*$", "", t, flags=re.I)
+    t = re.sub(r"\s+İhlas Haber Ajansı$", "", t, flags=re.I)
+    t = re.sub(r":\s*Herand Akademi ile.*$", "", t, flags=re.I)
+    if "..." in t and "Vakıflar Genel Müdürlüğü" in t:
+        parts = [p.strip() for p in t.split("...") if len(p.strip()) > 25]
+        if len(parts) >= 2:
+            t = f"Vakıflar Genel Müdürlüğü {parts[-1]}"
+    t = re.sub(r"\bsona ermiştir\.?$", "Tamamlandı", t, flags=re.I)
+    t = re.sub(r"\s+(?:Türkiye Ulusal Ajansı tarafından|Değerli Başvuru Sahipleri|Erasmus\+ programı ülke merkezli|Mesleki Eğitim Öğrenici ve Personel Hareketliliği için|2025 başvuru döneminde Erasmus\+).*$", "", t)
+    t = re.sub(r"\(2026-YÖK-ykds\)\s*başvur$", "(2026-YÖK-YKDS) Başvuruları Başladı", t, flags=re.I)
+    t = re.sub(r"\.{2,}|…", " ", t).strip()
+
+    # Clickbait giriş hitaplarını temizle
+    t = re.sub(r"^(?:son dakika|flaş|üniversitelilere müjde|üniversite öğrencilerine müjde|milyonlarca öğrencinin gözü gsb['’]de|gözler 2026 vgm burs başvuru sonuçlarında|burs arayan üniversiteliler için kritik gün|üniversite öğrencileri dikkat|hakkari['’]deki öğrenciler dikkat|hafta sonu sınav var mı)\s*[:\-!|.?]?\s*", "", t, flags=re.I)
+    t = re.sub(r"^Sevgili\s+(?:TEV['’]liler|Gençler),\s*", "", t, flags=re.I)
+
     if " | " in t:
-        parts = [p.strip() for p in t.split(" | ") if len(p.strip()) > 15]
+        parts = [p.strip() for p in t.split(" | ") if len(p.strip()) > 12]
         if parts:
-            parts.sort(key=lambda p: sum(1 for c in p if c.isupper()) / max(1, len(p)))
-            t = parts[0]
+            all_entities = [ent for ent in SPECIFIC_ENTITIES if any(ent in tr_lower(p) for p in parts)]
+            scored = sorted(parts, key=lambda p: (
+                sum(1 for ent in SPECIFIC_ENTITIES if ent in tr_lower(p)),
+                -(sum(1 for c in p if c.isupper()) / max(1, len(p)))
+            ), reverse=True)
+            chosen = scored[0]
+            if all_entities and not any(ent in tr_lower(chosen) for ent in all_entities):
+                chosen = f"{all_entities[0].upper()} {tr_lower(chosen)}"
+            t = chosen
+
     if ":" in t:
-        left, right = t.split(":", 1)
-        upper_ratio = sum(1 for c in left if c.isupper()) / max(1, sum(1 for c in left if c.isalpha()))
-        if len(right.strip()) >= 20 and (upper_ratio > 0.6 or "sorgulama ekranı" in tr_lower(left)):
-            t = right.strip()
-    alpha = [c for c in t if c.isalpha()]
-    if alpha and sum(1 for c in alpha if c.isupper()) / len(alpha) > 0.75:
-        t = tr_capitalize(tr_lower(t))
-        for acr in ["KYK", "YKS", "ÖSYM", "YÖK", "KPSS", "ALES", "YDS", "DGS", "VGM", "TEV", "GSB", "TÜBİTAK", "İBB", "AÖF", "DHBT", "TDK"]:
-            t = re.sub(rf"\b{tr_lower(acr)}\b", acr, t)
-    if t.count("?") >= 2:
-        first_q = t.split("?", 1)[0].strip() + "?"
-        if len(first_q) >= 25:
+        left, right = [x.strip() for x in t.split(":", 1)]
+        ll, rl = tr_lower(left), tr_lower(right)
+        if re.search(r"\b(sorgulama ekranı|başvuru ekranı|sonuç ekranı|sonuç tarihi|son güncel durum)\b", ll):
+            left_entities = [ent for ent in SPECIFIC_ENTITIES if ent in ll]
+            if left_entities and not any(ent in rl for ent in left_entities):
+                ent_label = left_entities[0].upper()
+                t = f"2026-2027 {ent_label} Burs ve Sınav Süreci: {right}"
+            elif rl in ("e-devlet ile hemen öğren", "işte detaylar"):
+                t = re.sub(r"\bsorgulama ekranı\b", "ve Sorgulama Süreci", left, flags=re.I)
+            else:
+                t = right
+        elif rl in ("e-devlet ile hemen öğren", "işte detaylar", "başvuru şartları ve detaylar"):
+            t = left
+
+    # Çoklu clickbait sorularını tek ve net bilgi başlığına dönüştür
+    if "?" in t:
+        q_parts = [p.strip() for p in t.split("?") if p.strip()]
+        first_q = q_parts[0] + "?"
+        if len(q_parts) >= 2 and not any(ent in tr_lower(first_q) for ent in SPECIFIC_ENTITIES) and any(ent in tr_lower(q_parts[1]) for ent in SPECIFIC_ENTITIES):
+            t = q_parts[1].strip(" -–|.,!") + "?"
+        elif len(first_q) >= 28:
             t = first_q
-    t = re.sub(r"\s+", " ", t).strip(" -–|")
-    if len(t) > 95:
-        t = t[:92].rsplit(" ", 1)[0] + "…"
+
+    # Soru kalıplarını doğal ve resmiyet dengeli bilgi başlıklarına dönüştür (kelime tekrarı yapmadan)
+    if "?" in t:
+        t = re.sub(r"(?:başvuru\s+)?(?:sonuçları\s+)?açıklandı mı,?\s*ne zaman açıklanacak(?:,\s*erken açıklanır mı)?\??", "başvuru sonuçları ve açıklanma takvimi", t, flags=re.I)
+        t = re.sub(r"(?:başvuru\s+)?(?:sonuçları\s+)?ne zaman açıklanacak,?\s*açıklandı mı\??", "sonuçlarında son durum ve takvim", t, flags=re.I)
+        t = re.sub(r"(?:başvuru\s+)?(?:sonuçları\s+)?açıklandı mı\s+ve\s+ne zaman ilan edilecek\??", "sonuçları ve ilan takvimi", t, flags=re.I)
+        t = re.sub(r"(?:başvuru\s+)?(?:sonuçları\s+)?ne zaman,?\s*hangi gün açıklanacak\??", "sonuçlarının açıklanma takvimi", t, flags=re.I)
+        t = re.sub(r"(?:başvuru\s+)?(?:sonuçları\s+)?ne zaman açıklanacak,?\s*hangi tarihte\??", "sonuçları ve sorgulama süreci", t, flags=re.I)
+        t = re.sub(r"(?:başvuruları\s+)?başladı mı,?\s*ne zaman başlıyor\??", "başvuru takvimi ve şartları", t, flags=re.I)
+        t = re.sub(r"\bson gün ne zaman,?\s*saat kaçta bitiyor\??", "son başvuru tarihi ve saati", t, flags=re.I)
+        t = re.sub(r"(?:başvuru\s+)?(?:sonuçları\s+)?(?:nereden sorgulanır|nasıl(?:\s+ve\s+nereden)?\s+öğrenilir)\??", "sonuç sorgulama ekranı ve değerlendirme süreci", t, flags=re.I)
+        t = re.sub(r"\bnasıl yapılır(?:,\s*şartları neler.*)?\??", "başvuru adımları ve şartları", t, flags=re.I)
+        t = re.sub(r"\bne zaman açıklanacak(?:\s+2026)?\??|\bne zaman\s+2026\??", "takvimi ve son durum", t, flags=re.I)
+        t = re.sub(r"\bne zaman yapılacak\??", "takvimi ve uygulama detayları", t, flags=re.I)
+        t = re.sub(r"\bne zaman alınacak\??", "başvuru takvimi ve ücretleri", t, flags=re.I)
+        t = re.sub(r"\bne zaman belli olacak\??", "takvimi ve değerlendirme süreci", t, flags=re.I)
+        t = re.sub(r"\bbu hafta açıklanacak mı\??", "değerlendirme süreci ve beklenen takvim", t, flags=re.I)
+        t = re.sub(r"\baçıklandı mı\??|\berişime açıldı mı\??|\bbelli oldu mu\??|\bbaşladı mı\??", "son durum ve sorgulama süreci", t, flags=re.I)
+        t = re.sub(r"\bne kadar\??", "güncel tutarları ve detayları", t, flags=re.I)
+        t = re.sub(r"\bhangi durumlarda kesilir\??", "kesilme nedenleri ve uygulama kuralları", t, flags=re.I)
+        t = re.sub(r"\bnasıl bir yol izlenmeli\??", "başvuru ve hazırlık rehberi", t, flags=re.I)
+        t = re.sub(r"\bnelere dikkat etmelisiniz\??", "dikkat edilmesi gereken kurallar", t, flags=re.I)
+        t = re.sub(r"\bşartları neler\??", "başvuru şartları ve detayları", t, flags=re.I)
+        t = re.sub(r"\bkimler başvurabilir\??", "başvuru şartları", t, flags=re.I)
+        t = re.sub(r"\bders var mı yok mu\??", "eğitim-öğretim durumu", t, flags=re.I)
+        t = re.sub(r"\bbugün ne sınavı var\??", "hafta sonu sınav uygulamaları", t, flags=re.I)
+        t = re.sub(r"\botomatik mi veriliyor\??", "öğrenim kredisi uygulaması", t, flags=re.I)
+        t = re.sub(r"\bhangi üniversiteye ayrıldı\??", "üniversitelere göre dağılımı", t, flags=re.I)
+
+    # Kalan ünlem ve geri sayım kalıplarını sadeleştir
+    t = re.sub(r"\biçin geri sayım(?: başladı)?!?\s*", "Değerlendirme Süreci: ", t, flags=re.I)
+    t = re.sub(r"!\s+", ": ", t)
+
+    alpha = [c for c in t if c.isalpha()]
+    if alpha and sum(1 for c in alpha if c.isupper()) / len(alpha) > 0.60:
+        t = tr_capitalize(tr_lower(t))
+
+    t = fix_acronyms(t)
+    t = re.sub(r"\?+\s*:", ":", t)
+    t = re.sub(r":\s*:", ":", t)
+    t = re.sub(r"\s+", " ", t).strip(" -–|.,!?")
+
+    # Çok kısa/eksik kalan başlıkları tamamla
+    short_expansions = {
+        "brezilya burs programı": "Yükseköğretim Kurulu Brezilya Hükümeti Burs Programı Duyurusu",
+        "kbü'den erasmus başarısı": "Karabük Üniversitesi'nden Erasmus+ Projelerinde Önemli Başarı",
+        "ösym 3 sınav düzenledi": "ÖSYM Hafta Sonu Üç Ayrı Sınav Uygulamasını Tamamladı",
+        "3 yeni fakülte ve 2 enstitü kuruldu": "Üniversitelerde 3 Yeni Fakülte ve 2 Enstitü Kurulmasına İlişkin Karar",
+        "rabve vakfı burs": "Rabve Vakfı 2026-2027 Eğitim Dönemi Burs Başvuruları",
+        "yks 19-20 haziran’da": "2027 YKS Sınav Takvimi Açıklandı: Sınav 19-20 Haziran'da Yapılacak",
+        "yks 19-20 haziran'da": "2027 YKS Sınav Takvimi Açıklandı: Sınav 19-20 Haziran'da Yapılacak",
+        "kpss ortaöğretim yapıldı": "2026 KPSS Ortaöğretim Sınavı Tamamlandı",
+        "95 yılda on binlerce mezun": "TED Ankara Koleji'nde 95 Yılda On Binlerce Mezun Başarısı",
+        "aftan yararlananlara yatay geçiş yolu": "Öğrenci Affından Yararlananlar İçin Yatay Geçiş Düzenlemesi",
+    }
+    if tr_lower(t) in short_expansions:
+        t = short_expansions[tr_lower(t)]
+
+    if len(t) > 110 and ":" in t:
+        l_part, r_part = [x.strip() for x in t.split(":", 1)]
+        if len(l_part) >= 35:
+            t = l_part
     return tr_capitalize(t)
 
 
+def clean_glued_text(text: str) -> str:
+    """Metin içindeki HTML entity'leri, yapışık BÜYÜK HARF ara başlıkları ve nokta sonrası eksik boşlukları temizler."""
+    t = html.unescape(text or "")
+    # Emojileri ve madde işaretlerini temizle
+    t = re.sub(r"[🟠🔴🟢🔵🟡🟣⚫⚪✓✔•▪▸►]+", " ", t)
+    # Cümle ortasındaki BÜYÜK HARF parantez içi ara başlıkları temizle
+    t = re.sub(r"\([A-ZÇĞİÖŞÜ\s]{8,45}\)", " ", t)
+    # Ham URL'leri temiz domain adına dönüştür (örn. https://ais.osym.gov.tr -> ais.osym.gov.tr)
+    t = re.sub(r"https?://(?:www\.)?([a-zA-Z0-9.\-]+)(?:/[^\s,.)]*)?", r"\1", t)
+    # 1. Cümle arasına yapışmış BÜYÜK HARF ara başlıkları kes (örn. ".KÖKLÜ BİR GEÇMİŞUzun yıllar...") - rakamla başlayan tarihleri koru!
+    t = re.sub(
+        r"([.!?]|^)\s*[A-ZÇĞİÖŞÜ]{2,}[A-ZÇĞİÖŞÜ0-9\s,’'.,:\-]{4,75}?(?=[A-ZÇĞİÖŞÜ][a-zçğıöşü]{2,}|(?:KPSS|YKS|ÖSYM|YÖK|KYK|VGM|TÜBİTAK|TEV|İBB|GSB|ABD|AB)\s+[a-zçğıöşü]{2,})",
+        r"\1 ",
+        t,
+    )
+    # 2. YÖK vb. sayfalarda nokta konulmadan biten özet fiillerinden sonra nokta ekle
+    t = re.sub(
+        r"\b(bulundu|belirtti|söyledi|vurguladı|kaydetti|ifade etti|katıldı|açıkladı|bildirdi|duyurdu|verdi)\s+(?=[A-ZÇĞİÖŞÜ“\"])",
+        r"\1. ",
+        t,
+    )
+    t = re.sub(r":\.", ".", t)
+    # 3. "Katılımcılar ve kurum temsilcileri:Toplantıya" veya "Okul Seçimi: Okul" gibi yapışık etiket başlıkları kes
+    t = re.sub(r"(?:[.!?]|^)\s*[A-ZÇĞİÖŞÜ][a-zçğıöşüA-ZÇĞİÖŞÜ\s(),]{2,45}:\s*(?=[A-ZÇĞİÖŞÜ])", ". ", t)
+    # 4. Küçük harften hemen sonra başlayan Büyük+küçük harf yapışıklıklarını ayır (örn. "sona eriyorVakıflar")
+    t = re.sub(r"([a-zçğıöşü])([A-ZÇĞİÖŞÜ][a-zçğıöşü]{2,})", r"\1. \2", t)
+    # 5. Nokta/soru/ünlem işaretinden sonra unutulmuş boşlukları ekle
+    t = re.sub(r"([a-zçğıöşü0-9”\"')])([.!?])([A-ZÇĞİÖŞÜ“\"])", r"\1\2 \3", t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def split_sentences(text: str) -> list[str]:
+    """Kısaltmaları (Prof., Dr., T.C.) ve sıra sayılarını (2. Dönem) bölmeden cümlelere ayırır."""
+    t = clean_glued_text(text)
+    if not t:
+        return []
+    # Kısaltmaları koru
+    t = re.sub(r"\bT\.C\.", "T∯C∯", t)
+    t = re.sub(
+        r"\b(Prof|Doç|Dr|Öğr|Gör|Arş|Uzm|Av|Müh|Yrd|Bşk|Gen|Md|No|Tel|Cad|Sok|Mah|Bul|vb|vs|bkz|örn|yak|ort)\.",
+        r"\1∯",
+        t,
+        flags=re.I,
+    )
+    # Sıra sayılarını koru (örn. 2. Dönem, 11. Avrasya, 1. sınıf)
+    t = re.sub(
+        r"\b(\d{1,2})\.(?=\s*(?:Dönem|dönem|Sınıf|sınıf|Basamak|basamak|Oturum|oturum|Çağrı|çağrı|Yıl|yıl|Grup|grup|Kademe|kademe|Derece|derece|Bölge|bölge|Aşama|aşama|Adım|adım|Kura|kura|Tercih|tercih|Avrasya|Uluslararası|Ulusal|sırada|sıraya|kez|gün|hafta|ay))",
+        r"\1∯",
+        t,
+    )
+    parts = re.split(r"(?<=[.!?”\"'])\s+(?=[A-ZÇĞİÖŞÜ0-9“\"])", t)
+    return [p.replace("∯", ".").strip() for p in parts if p.strip()]
+
+
 def strip_page_chrome(s: str, title: str) -> str:
-    """Kaynak sayfadan sızan 'Ana Sayfa > Kategori > Başlık etiket' kalıntılarını keser."""
-    out = s.strip()
+    """Kaynak sayfadan sızan 'Ana Sayfa > Kategori > Başlık etiket' kalıntılarını ve kesik başlangıçları onarır."""
+    out = clean_glued_text(s)
     out = re.sub(r"^.*?\b(Ana Sayfa|Kaynak Ekle|Anasayfa)\b\s*(?:Eğitim\s*(?:&\s*Sağlık)?\s*)?", "", out, flags=re.I)
     out = re.sub(r"^Yayınlanma:\s*\d{1,2}[./]\d{1,2}[./]\d{4}\s*\d{1,2}:\d{2}\s*", "", out, flags=re.I)
     out = re.sub(r"^[a-zçğıöşüA-ZÇĞİÖŞÜ\s]+resmî internet sayfasında yayımlanan duyuru:.*?(?=[A-ZÇĞİÖŞÜ0-9]|$)", "", out)
+    out = re.sub(r"\s*-->\s*\d{2}\.\d{2}\.\d{4}.*$", "", out)
     tl, ol = tr_lower(title.rstrip("…. ")), tr_lower(out)
-    for key in (tl, tl[-35:]):
-        if len(key) >= 22:
-            pos = ol.find(key)
-            end = pos + len(key)
-            if 0 <= pos < 220 and len(out) - end > 40 and (end >= len(out) or not out[end].isalnum()):
-                out = out[end:].lstrip(" :!?.-–—•")
-                break
-    out = re.sub(r"^[\-–—•]+\s*", "", out)
-    out = re.sub(r"\s+[\-–—•]+\s*(?=[A-ZÇĞİÖŞÜ“\"])", ". ", out)
-    # Başta kalan kesik ek veya tek kelimelik etiketleri temizle
-    out = re.sub(r"^(Nde|İnde|Ünde|Dan|Den|Nin|Nın|Av Günü [^\n.]{5,50}|İtiminde [^\n.]{5,50}|Li [^\n.]{5,45}!)\s*", "", out)
-    out = re.sub(r"^(başvuruları?\s+başladı!?\.?\s+)?(burs|haber|eğitim|üniversite)\s+(?=[A-ZÇĞİÖŞÜ0-9])", "", out, flags=re.I)
+    if len(tl) >= 22:
+        pos = ol.find(tl)
+        end = pos + len(tl)
+        if 0 <= pos < 180 and len(out) - end > 45 and (end >= len(out) or not out[end].isalnum()):
+            out = out[end:].lstrip(" :!?.-–—•")
+    out = re.sub(r"^[\-–—•'\"”]+\s*", "", out)
+    out = re.sub(r"\s+[\-–—•]+\s*(?=[A-ZÇĞİÖŞÜ“\"0-9])", ". ", out)
+    # Başta kalan kesik ek veya tek kelimelik etiketleri temizle (DİKKAT: büyük/küçük harf duyarlı!)
+    out = re.sub(r"^(Nde|İnde|Ünde|Dan|Den|Nin|Nın|E Yenilik [^\n.]{5,55}|TS Diş [^\n.]{5,55}|Av Günü [^\n.]{5,50}|İtiminde [^\n.]{5,50}|Li [^\n.]{5,45}!)\s*", "", out)
+    out = re.sub(r"^(?:[Bb]aşvuruları?\s+[Bb]aşladı!?\.?\s+)?(?:Burs|BURS|Haber|HABER|Eğitim|EĞİTİM|Üniversite|ÜNİVERSİTE|Başvuruları)\s+(?=[A-ZÇĞİÖŞÜ0-9])", "", out)
+    out = re.sub(r"^(?:Temel Soru\s+)?Kitapçıkları ve Cevap Anahtarları Yayımlandı\s+", "", out)
+    out = re.sub(r"^Öğrencilerine Karşılıksız Burslar\s+(?=[A-ZÇĞİÖŞÜ])", "", out)
     out = re.sub(r"^Binlerce Öğrencinin Beklediği [^\n.]{5,50} İçin\s+", "", out)
+    out = re.sub(r"^Türkiye['’]nin dijital üniversitesinde \d+ bin kişi ücretsiz eğitim alacak\s+", "", out)
+    out = re.sub(r"^Tazelenme Üniversitesi[^\n.]{5,60}talebi\s+", "", out)
+    out = re.sub(r"\bÜniversitede bilgi aktarma dönemi değişiyor\s+", "", out)
+    # Başta duran YÖK tırnak içi spotlarını temizle
+    out = re.sub(r"^(?:Yükseköğretim Kurulu Başkanı (?:Erol\s+)?Özvar:\s*)?(?:[“\"][^”\"]+[”\"]\s*)+(?=[A-ZÇĞİÖŞÜ])", "", out)
+
+    # Önceki kesimlerden dolayı başı eksik kalmış cümleleri tam öznesiyle onar
+    out = re.sub(r"^İşte,?\s+o\s+detaylar\.?\s*", "", out, flags=re.I)
+    out = re.sub(r"^Ekim\s+2026\s+tarihleri\s+arasında\b", "20-31 Ekim 2026 tarihleri arasında", out)
+    out = re.sub(r"^Yüksek\s+[Ll]isans\s+öğrencileri\s+için\b", "Lisansüstü burs ödemeleri yüksek lisans öğrencileri için", out)
+    out = re.sub(r"^Giderlerine\s+katkı\s+sağlamak\b", "Eğitim giderlerine katkı sağlamak", out)
+    out = re.sub(r"^[Kk]imlik\s+(numaralar[ıi]|numaras[ıi]|şifre)", r"Adaylar, T.C. kimlik \1", out)
+    out = re.sub(r"^Öğrencilerinin\b", "Üniversite öğrencilerinin", out)
+    out = re.sub(r"^Öğrencilerine\b", "Üniversite öğrencilerine", out)
+    out = re.sub(r"^Öğrencileri\s+için\b", "Üniversite öğrencileri için", out)
+    out = re.sub(r"^Eğitiminde\b", "Üniversite eğitiminde", out)
+    out = re.sub(r"^Eğitimi\s+(sırasında|başka|için)\b", r"Üniversite eğitimi \1", out)
+    out = re.sub(r"^Dönemi\s+boyunca\b", "Eğitim öğretim dönemi boyunca", out)
+    out = re.sub(r"^Ödemeleri\b", "Burs ödemeleri", out)
+    out = re.sub(r"^Verilirken\b", "Burs verilirken", out)
+    out = re.sub(r"^Arayan\s+üniversite\b", "Burs arayan üniversite", out)
+    out = re.sub(r"^Başvuruları\s+her\s+yıl\b", "Burs başvuruları her yıl", out)
+    out = re.sub(r"^Başvuruları,\s+", "Burs başvuruları, ", out)
+    out = re.sub(r"^Değerlendirmeleri\s+tamamlandığında\b", "Başvuru değerlendirmeleri tamamlandığında", out)
+    out = re.sub(r"^Başvurusu\s+(yapmak|değerlendirme)\b", r"Burs başvurusu \1", out)
+    out = re.sub(r"^Başvuruları\s+(\d{1,2}\s+Ocak)", r"Sınav başvuruları \1", out)
+    out = re.sub(r"^Ve\s+öğrenim\s+kredisi\b", "KYK burs ve öğrenim kredisi", out)
+    out = re.sub(r"^Ve\s+günlük\s+yaşam\b", "Eğitim ve günlük yaşam", out)
+    out = re.sub(r"^Dönem\s+(tercih|yerleştirme|kontenjan|sınav)\b", r"İlgili dönem \1", out)
+    out = re.sub(r"^döneminde\s+aşağıdaki\b", "Yeni başvuru döneminde ilgili", out)
     return tr_capitalize(out.strip(" -–—•"))
+
+
+def ensure_sentence_end(s: str) -> str:
+    """Cümle sonundaki yarım kalmış ifadeleri onarır ve tek nokta ile bitmesini sağlar."""
+    out = re.sub(r"\.{2,}|…", ".", s.strip(" -–—•"))
+    if "“" not in out and out.endswith("”"):
+        out = out[:-1].rstrip()
+    if out.count('"') == 1 and out.endswith('"'):
+        out = out[:-1].rstrip()
+    out = re.sub(r"\bbaşvurularının ardından\.?$", "başvurularının ardından değerlendirme süreci devam ediyor.", out, flags=re.I)
+    out = re.sub(r"\bsonuçları için\.?$", "sonuçları için bekleyiş sürüyor.", out, flags=re.I)
+    out = re.sub(r",\s*sözlerini şöyle sürdürdü:?\.?$", " açıklamasında bulundu.", out, flags=re.I)
+    out = re.sub(r"\bişaret eden\.?$", "işaret etti.", out, flags=re.I)
+    if out and out[-1] not in ".!?”\"":
+        out += "."
+    out = re.sub(r"\.+", ".", out)
+    return tr_capitalize(out)
+
+
+def is_complete_sentence(s: str) -> bool:
+    """Cümlenin anlamlı, başı ve sonu tam bir Türkçe cümle olup olmadığını denetler."""
+    txt = s.strip()
+    if len(txt) < 45 or len(txt) > 460:
+        return False
+    if "?" in txt or "-->" in txt or "..." in txt or "…" in txt:
+        return False
+    if txt.startswith(("'", "’", "”", "“", "\"", ")", "E Yenilik", "TS Diş", "Av Günü", "İtiminde", "Li ", "Nde ", "Den ", "Nin ", "Dönem'", "Dönem,", "Dönem ", "Sınavlarının ", "Ve ", "1 doktor", "Yönetmeliği hükümlerine")):
+        return False
+    if txt.endswith(":"):
+        return False
+    # Kısaltma veya sıra sayısı ile biten yarım cümleleri reddet (örn. "Prof.", "Dr.", "T.C.", "2.")
+    if re.search(r"(?:\b(?:Prof|Doç|Dr|Öğr|Gör|Arş|Uzm|Av|Sayın|T\.C)|\b\d{1,2})\.$", txt, flags=re.I):
+        return False
+    # Tablo veya üst üste binmiş başlık kalıntısı kontrolü
+    if len(re.findall(r"\d[\d.]*\s*TL", txt, flags=re.I)) >= 3 and "," not in txt:
+        return False
+    if "•" in txt or "Not: Bu tablo" in txt:
+        return False
+    words = re.findall(r"[a-zçğıöşüA-ZÇĞİÖŞÜ0-9]+", tr_lower(txt))
+    if not words or len(words) < 6:
+        return False
+    last_w = words[-1]
+    last_two = f"{words[-2]} {words[-1]}" if len(words) >= 2 else last_w
+    if last_w in DANGLING_ENDINGS or last_two in DANGLING_ENDINGS:
+        return False
+    return True
 
 
 def paraphrase_sentence(s: str) -> str:
     out = s.strip(" -–—•")
-    # Başlangıçtaki breadcrumb/kategori veya satır içi reklam kalıntılarını temizle
     out = re.sub(r"^Ana Sayfa\s+[^\n.]{5,90}\b(burs|haber|eğitim)\s+", "", out, flags=re.I)
     out = re.sub(r"^[A-ZÇĞİÖŞÜ][a-zçğıöşü]+\s+burs\s+başvuruları\s+(?=[A-ZÇĞİÖŞÜ])", "", out)
-    # Tamamı büyük harf olan ara başlık cümlelerini ele
     alpha = [c for c in out if c.isalpha()]
-    if alpha and sum(1 for c in alpha if c.isupper()) / len(alpha) > 0.7:
+    if alpha and sum(1 for c in alpha if c.isupper()) / len(alpha) > 0.65:
         return ""
     for pat, repl in REWRITE_MAP:
         out = re.sub(pat, repl, out, flags=re.I)
+    out = fix_acronyms(out)
     out = re.sub(r"\s+", " ", out).strip(" -–—•")
-    return tr_capitalize(out) if out else ""
+    if not out:
+        return ""
+    out = ensure_sentence_end(out)
+    return out if is_complete_sentence(out) else ""
 
 
 def is_seo_spam_sentence(s: str) -> bool:
-    sl = tr_lower(s)
-    if len(s) < 35:
+    sl = tr_lower(s.strip())
+    if len(sl) < 42:
+        return True
+    if "?" in sl or "-->" in sl or "..." in sl or "…" in sl:
+        return True
+    if sl.startswith(("peki", "işte ", "işte,", "ancak ne zaman", "uygulama el kitabı", "' başlıklı")):
         return True
     if "resmî internet sayfasında yayımlanan duyuru:" in sl:
         return True
     if any(j in sl for j in JUNK_PHRASES):
         return True
-    if s.count("?") >= 2:
-        return True
-    if s.count(",") >= 3 and any(w in sl for w in ["ne zaman", "sorgulama", "açıklandı mı", "kaç tl"]):
-        return True
     if any(p in sl for p in [
         "haberimizde", "işte detaylar", "merak konusu oldu", "yoğun şekilde araştırılıyor",
         "aramaları hız kazandı", "gündemdeki yerini koruyor", "sorularının yanıtı",
         "detaylar haberimizde", "haberin detayları", "merak edilen tarih",
+        "şu adımlar izlenecek:", "temel hususlar şunlar:", "detaylar şunlardır:",
     ]):
         return True
     return False
@@ -361,60 +652,63 @@ def fetch_raw_article(url: str) -> tuple[str, list[str]]:
 
 
 def official_context_paragraphs(title: str, source: str, category: str) -> list[str]:
-    """Doğrudan ana kaynaktan (ÖSYM, YÖK, TÜBİTAK, VGM, TEV vb.) alınan duyurular için özgün haber bağlamı üretir."""
-    t_clean = title.rstrip(".?!")
+    """Doğrudan ana kaynaktan (ÖSYM, YÖK, TÜBİTAK, VGM, TEV vb.) alınan veya kısa kalan duyurular için dengeli ve anlaşılır haber metni üretir."""
+    tl = tr_lower(title)
+    if category == "KYK & Yurtlar" or "kyk" in tl:
+        return [
+            "Gençlik ve Spor Bakanlığı (GSB) Kredi ve Yurtlar Genel Müdürlüğü tarafından yürütülen burs, öğrenim kredisi ve yurt süreçleri e-Devlet kapısı üzerinden takip ediliyor. Başvuruda bulunan öğrencilerin beyan ettiği ekonomik, sosyal ve akademik bilgiler kamu kurumları aracılığıyla doğrulanıyor.",
+            "Sonuçların ilan edilmesinin ardından burs veya öğrenim kredisi hakkı kazanan öğrencilerin, belirtilen süre içinde e-Devlet üzerinden taahhütname onayını tamamlaması gerekiyor. Ödemeler, öğrencilerin T.C. kimlik numaralarının son hanesine göre belirlenen günlerde Ziraat Bankası hesaplarına yatırılıyor.",
+        ]
     if source == "ÖSYM" or category == "Sınavlar":
         return [
-            f"Ölçme, Seçme ve Yerleştirme Merkezi (ÖSYM) tarafından yayımlanan resmî duyuru kapsamında '{t_clean}' başlıklı süreç adayların erişimine açıldı.",
-            "Sınava katılacak veya sonuç/tercih işlemi yapacak adaylar, T.C. kimlik numaraları ve aday şifreleriyle ÖSYM Aday İşlemleri Sistemi (ais.osym.gov.tr) veya Sonuç Açıklama Sistemi (sonuc.osym.gov.tr) üzerinden işlemlerini doğrudan tamamlayabiliyor.",
-            "ÖSYM duyurusunda yer alan kılavuz hükümleri, başvuru ve geç başvuru tarihleri ile sınav merkezi kurallarının adaylar tarafından dikkatle incelenmesi gerekiyor.",
+            "Ölçme, Seçme ve Yerleştirme Merkezi (ÖSYM) tarafından yayımlanan duyuruyla birlikte ilgili sınav ve yerleştirme takvimindeki güncel uygulama adımları netleşti. Adaylar, T.C. kimlik numaraları ve şifreleriyle ÖSYM Aday İşlemleri Sistemi (ais.osym.gov.tr) veya Sonuç Açıklama Sistemi (sonuc.osym.gov.tr) üzerinden işlemlerini doğrudan yapabiliyor.",
+            "Başvuru tarihleri, sınav giriş belgeleri ve kılavuzda yer alan kuralların hak kaybı yaşanmaması için resmî duyuru metninden dikkatle takip edilmesi öneriliyor. Sürece ilişkin tüm güncellemeler ÖSYM'nin resmî internet sayfası üzerinden adayların bilgisine sunuluyor.",
         ]
     if source == "YÖK":
         return [
-            f"Yükseköğretim Kurulu (YÖK) tarafından paylaşılan '{t_clean}' başlıklı resmî açıklama, üniversite öğrencileri ve akademik birimler için yürürlüğe giren yeni detayları içeriyor.",
-            "YÖK'ün yükseköğretim kurumlarına gönderdiği çerçeve kararlar doğrultusunda üniversite senatoları ve öğrenci işleri daire başkanlıkları ilgili uygulama takvimini yürütecek.",
-            "Öğrenciler ve akademisyenler, düzenlemenin tam metnine ve uygulama esaslarına Yükseköğretim Kurulu'nun resmî internet sayfası (yok.gov.tr) üzerinden ulaşabiliyor.",
+            "Yükseköğretim Kurulu (YÖK) tarafından paylaşılan açıklama, üniversite öğrencileri ve akademik birimler için yürürlüğe giren yeni uygulamaları kapsıyor. YÖK'ün yükseköğretim kurumlarına ilettiği kararlar doğrultusunda üniversite yönetimleri ve öğrenci işleri birimleri ilgili takvimi yürütecek.",
+            "Düzenlemenin ayrıntılarına ve uygulama esaslarına Yükseköğretim Kurulu'nun resmî internet sayfası üzerinden ulaşılabiliyor. Öğrencilerin kendi üniversitelerinin duyuru ekranlarını da eş zamanlı olarak kontrol etmesi gerekiyor.",
         ]
-    if source == "TÜBİTAK":
+    if source == "TÜBİTAK" or "tübitak" in tl:
         return [
-            f"TÜBİTAK Bilim İnsanı Destek Programları Başkanlığı (BİDEB) ve ilgili araştırma grupları tarafından '{t_clean}' duyurusu resmî olarak yayımlandı.",
-            "Lisans, yüksek lisans, doktora öğrencileri ile araştırmacıları kapsayan çağrı ve burs programlarına başvurular TÜBİTAK Yönetim Bilgi Sistemi (tybs.tubitak.gov.tr) ve BİDEB Başvuru Sistemi (ebideb.tubitak.gov.tr) üzerinden çevrim içi olarak alınıyor.",
-            "Adayların çağrı metninde belirtilen son başvuru tarihinden önce ARBİS kayıtlarını güncellemesi ve istenen belgeleri sisteme yüklemesi gerekiyor.",
+            "TÜBİTAK Bilim İnsanı Destek Programları Başkanlığı (BİDEB) ve ilgili araştırma grupları tarafından yeni dönem çağrı ve destek duyurusu yayımlandı. Lisans, yüksek lisans ve doktora öğrencileri ile araştırmacıları kapsayan programlara başvurular TÜBİTAK Yönetim Bilgi Sistemi (tybs.tubitak.gov.tr) üzerinden çevrim içi olarak alınıyor.",
+            "Başvuru yapacak adayların son başvuru tarihinden önce Araştırmacı Bilgi Sistemi (ARBİS) kayıtlarını güncellemesi ve çağrı metninde istenen belgeleri eksiksiz yüklemesi gerekiyor.",
         ]
     if source in ("VGM", "TEV") or category == "Burslar":
         return [
-            f"{source} tarafından doğrudan yayımlanan '{t_clean}' duyurusuyla birlikte üniversite öğrencilerini ilgilendiren burs ve eğitim desteği sürecinde yeni aşamaya geçildi.",
-            "Burs başvuru ve değerlendirme işlemleri kurumun resmî çevrim içi başvuru ekranı üzerinden yürütülüyor; adayların öğrenim durumu, başarı şartı ve gelir beyanı bilgilerini doğru girmesi büyük önem taşıyor.",
-            "Sonuç açıklamaları, burs taahhütnamesi onayı ve aylık ödeme takvimi için yalnızca kurumun resmî duyuru sayfası takip edilmeli.",
+            "Üniversite öğrencilerine yönelik burs ve eğitim desteği sürecinde başvuru ile değerlendirme takvimi kurumun resmî duyuru ekranı üzerinden yürütülüyor. Adayların başvuru aşamasında öğrenim durumu, başarı şartı ve gelir beyanı bilgilerini eksiksiz ve doğru şekilde girmesi gerekiyor.",
+            "Değerlendirme işlemlerinin tamamlanmasının ardından sonuç açıklamaları, belge teslimi ve aylık ödeme takvimi ilgili kurumun resmî internet sayfası üzerinden duyuruluyor.",
         ]
     if source == "Türkiye Ulusal Ajansı" or category == "Yurt Dışı":
         return [
-            f"Türkiye Ulusal Ajansı tarafından paylaşılan '{t_clean}' başlıklı resmî duyuru, Erasmus+ ve Avrupa Dayanışma Programı (ESC) kapsamındaki öğrenci ve gençlik fırsatlarını içeriyor.",
-            "Yurt dışı öğrenim, staj hareketliliği ve gençlik projelerine başvuracak adaylar, üniversitelerinin uluslararası ilişkiler ofisleri ile Türkiye Ulusal Ajansı'nın (ua.gov.tr) uygulama rehberlerini esas almalı.",
-            "Hibe tutarları, başvuru şartları ve proje takvimine ilişkin tüm güncellemeler Ulusal Ajans portalında yayımlanıyor.",
+            "Türkiye Ulusal Ajansı ve yükseköğretim kurumları tarafından yürütülen uluslararası değişim programları, öğrencilere yurt dışında eğitim ve staj deneyimi kazanma imkânı sunuyor. Erasmus+ ve ikili iş birliği programlarına ilişkin güncel uygulama kuralları resmî rehberler doğrultusunda belirleniyor.",
+            "Yurt dışı öğrenim ve staj hareketliliğine katılacak adayların üniversitelerindeki uluslararası ilişkiler ofisleri ile Türkiye Ulusal Ajansı duyurularını düzenli olarak takip etmesi gerekiyor.",
+        ]
+    if category == "Kariyer & Staj" or "staj" in tl or "işkur" in tl:
+        return [
+            "Üniversite öğrencilerinin eğitim süreçleri devam ederken mesleki deneyim kazanmalarını ve iş gücü piyasasına hazırlanmalarını amaçlayan programlar kamu ve özel sektör iş birliğiyle yürütülüyor.",
+            "Adayların başvuru şartlarını, kontenjan dağılımlarını ve son başvuru tarihlerini ilgili kurumların resmî başvuru ekranları üzerinden kontrol ederek işlemlerini tamamlaması gerekiyor.",
         ]
     if source == "Resmî Gazete":
         return [
-            f"Resmî Gazete'nin bugünkü sayısında yayımlanan '{t_clean}' düzenlemesi resmen yürürlüğe girdi.",
-            "Yükseköğretim kurumlarının eğitim-öğretim, sınav, uygulama ve araştırma süreçlerini doğrudan ilgilendiren yönetmelik hükümleri ilgili üniversite birimleri tarafından uygulanacak.",
+            "Resmî Gazete'de yayımlanan yeni düzenleme bugün itibarıyla yürürlüğe girdi. Üniversitelerin eğitim-öğretim, sınav ve araştırma merkezlerini ilgilendiren yönetmelik hükümleri ilgili yükseköğretim kurumları tarafından uygulanacak.",
+            "Öğrenciler ve akademik personel, yönetmelik kapsamındaki uygulama esaslarını üniversitelerinin resmî duyuru sayfalarından inceleyebiliyor.",
         ]
     return [
-        f"{source} tarafından yayımlanan '{t_clean}' başlıklı duyuru yükseköğretim gündeminde yürürlüğe girdi.",
-        "Üniversite öğrencilerini ilgilendiren sürecin başvuru ve uygulama adımları kurumun resmî internet sayfasında yer alıyor.",
+        "Yükseköğretim gündeminde yer alan çalışmanın uygulama adımları ve takvimi ilgili kurumların resmî internet sayfaları üzerinden paylaşıldı. Üniversite öğrencileri ve akademik paydaşlar sürece ilişkin ayrıntıları kurum duyurularından takip edebiliyor.",
+        "Başvuru, kayıt ve uygulama takviminde olası güncellemeler için ilgili üniversite ve kurumların resmî açıklamalarının dikkate alınması öneriliyor.",
     ]
 
 
 def build_editorial_article(title: str, raw_desc: str, raw_paragraphs: list[str], category: str, source: str) -> tuple[str, list[str]]:
     """Ham paragrafları ve açıklamayı temizler, yeniden yazar ve (summary, body_list) döndürür."""
     candidates: list[str] = []
-    if raw_desc:
-        for s in re.split(SENT_SPLIT, raw_desc):
-            if len(s.strip()) >= 40:
-                candidates.append(s.strip())
-    for p in raw_paragraphs:
-        for s in re.split(SENT_SPLIT, p):
-            if len(s.strip()) >= 40:
-                candidates.append(s.strip())
+    for block in ([raw_desc] if raw_desc else []) + raw_paragraphs:
+        sub_blocks = re.split(r"\s+[\-–—•]\s+(?=[A-ZÇĞİÖŞÜ“\"0-9])", block or "")
+        for sb in sub_blocks:
+            for s in split_sentences(sb):
+                if len(s.strip()) >= 42:
+                    candidates.append(s.strip())
 
     # SEO spam, tekrar ve başlık kopyalarını ele
     seen_norms: list[str] = [norm_title(title)]
@@ -423,7 +717,7 @@ def build_editorial_article(title: str, raw_desc: str, raw_paragraphs: list[str]
         if is_seo_spam_sentence(s):
             continue
         rw = paraphrase_sentence(strip_page_chrome(s, title))
-        if len(rw) < 40:
+        if len(rw) < 45:
             continue
         nt = norm_title(rw)
         if any(nt[:45] == sn[:45] or is_similar(rw, sn) for sn in seen_norms):
@@ -433,7 +727,7 @@ def build_editorial_article(title: str, raw_desc: str, raw_paragraphs: list[str]
         if len(clean_sentences) >= 14:
             break
 
-    # Önce başlıktaki sorunun net cevabını seç, kalan cümleler "Ayrıntılar" olsun
+    # Önce başlıktaki konunun en net özetini seç, kalan cümleler "Ayrıntılar" olsun
     answer, clean_sentences = pick_answer(title, clean_sentences)
 
     # Cümleleri 2'şerli akıcı paragraflar halinde grupla
@@ -445,20 +739,25 @@ def build_editorial_article(title: str, raw_desc: str, raw_paragraphs: list[str]
         if len(body) >= 6:
             break
 
-    # Doğrudan resmî kurumlardan (ÖSYM, YÖK, TÜBİTAK, VGM, TEV vb.) gelen kısa duyuruları kendi özgün haber metnimizle zenginleştir
-    if source in OFFICIAL_SOURCES and len(body) < 2:
+    # Eğer gövde 2 paragraftan az kaldıysa, konuya uygun dengeli editoryal paragraflarla tamamla
+    if len(body) < 2:
         ctx_paras = official_context_paragraphs(title, source, category)
         for cp in ctx_paras:
-            if cp not in body:
+            if not any(is_similar(cp, existing) for existing in ([answer] if answer else []) + body):
                 body.append(cp)
-
-    # Eğer kaynak sayfa koruma/JS arkasındaysa ve hiç paragraf çıkmadıysa bağlamsal editoryal metin üret
-    if not body:
-        body = official_context_paragraphs(title, source, category)
+            if len(body) >= 2:
+                break
 
     if not answer:
-        answer = body[0] if body else title
-        body = body[1:]
+        if body:
+            answer = body[0]
+            body = body[1:]
+        else:
+            ctx = official_context_paragraphs(title, source, category)
+            answer = ctx[0]
+            body = ctx[1:]
+    if not body:
+        body = official_context_paragraphs(title, source, category)[:2]
     return answer, body
 
 
@@ -567,7 +866,7 @@ def fetch_official_sources() -> list[dict]:
             count = 0
             for href_val, inner in re.findall(pattern, raw_html, flags=re.S | re.I):
                 title = strip_html(inner).lstrip("–—-• ")
-                if len(title) < 22 or tr_lower(title) in ("devamını oku", "detaylar", "tümü", "tıklayınız"):
+                if len(title) < 22 or any(k in tr_lower(title) for k in ("devamını oku", "detaylar", "tümü", "tıklayınız", "e-devlet ile giriş yap", "aday işlemleri sistemi")):
                     continue
                 full_url = urllib.parse.urljoin(base_url, href_val.strip())
                 if full_url in seen_u:

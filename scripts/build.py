@@ -207,7 +207,14 @@ def href(e: dict) -> str:
 
 
 def trim(s: str, n: int) -> str:
-    return s if len(s) <= n else s[: n - 10].rsplit(" ", 1)[0] + "…"
+    if len(s) <= n:
+        return s
+    # Cümleyi yarıda kesmek yerine ilk tam cümleyi döndür
+    if ". " in s:
+        first = s.split(". ", 1)[0].strip()
+        if len(first) >= 40:
+            return first if first.endswith(".") else first + "."
+    return s
 
 
 def src_label(e: dict) -> str:
