@@ -1,25 +1,5 @@
 [
  {
-  "slug": "turk-yuksekogretimi-cop31-de",
-  "title": "Türk Yükseköğretimi COP31’de",
-  "summary": "Taraflar Konferansı’nda (COP31) üniversitelerimizin bilimsel birikimini uluslararası kamuoyuyla buluşturuyoruz. İklim değişikliğiyle mücadelede bilimin gücüne ve birlikte üreteceğimiz çözümlere inanıyoruz.",
-  "body": [
-   "Daha temiz bir çevre, daha yaşanabilir bir dünya ve gelecek nesiller için 208 üniversitemizle COP31’e hazırız. Üniversitelerimizin temiz enerji, su yönetimi, sıfır atık, döngüsel ekonomi ve iklime dirençli şehirler başta olmak üzere pek çok alanda geliştirdiği binlerce proje ve akademik çalışma, COP31’de uluslararası katılımcılarla paylaşılacak.",
-   "Paneller, stant etkinlikleri ve dijital sunumlarla Türkiye’nin sürdürülebilir bir geleceğe yönelik bilimsel ve teknolojik çözümleri tanıtılacak. Katılımcılar, “COP31 Türkiye” mobil uygulaması üzerinden etkinlik takvimine, ulaşım ve alan içi yönlendirme bilgilerine, güncel haber ve duyurulara erişebilir; katılmak istedikleri etkinlikleri kişisel ajandalarına ekleyebilirler.",
-   "Türkiye mobil uygulamasına erişmek için cop31.tr."
-  ],
-  "category": "Üniversiteler",
-  "tags": [
-   "yurt-dışı"
-  ],
-  "source": "YÖK",
-  "source_url": "https://www.yok.gov.tr/tr/announcements/turk-yuksekogretimi-cop31de-CWcuQ",
-  "raw_title": "Türk Yükseköğretimi COP31’de",
-  "published": "2026-11-07T17:49:44.631671+00:00",
-  "added": "2026-11-07T17:50:11.633036+00:00",
-  "ai": false
- },
- {
   "slug": "vakiflar-genel-mudurlugu-2026-2027-egitim-yili-egitim-yardimi-burs-bas",
   "title": "Vakıflar Genel Müdürlüğü 2026-2027 Eğitim Yılı Eğitim Yardımı/Burs Başvuruları Tamamlandı",
   "summary": "Vakıflar Genel Müdürlüğü 2026-2027 Eğitim Yılı Bursları. 06-20 Ekim 2026 tarihleri arasında ilköğretim ve ortaöğretim (ortaokul ve lise) öğrencileri için alınan eğitim yardımı başvurularının değerlendirme işlemlerine başlanmıştır.",
@@ -35,6 +15,26 @@
   "source": "VGM",
   "source_url": "https://www.vgm.gov.tr/duyurular/vakiflar-genel-mudurlugu-2026-2027-egitim-yili-egitim",
   "raw_title": "Vakıflar Genel Müdürlüğü 2026-2027 Eğitim Yılı Eğitim Yardımı/burs Hizmetle... 2026-2027 Eğitim Yılı Eğitim Yardımı/Burs Başvuruları Sona Ermiştir.",
+  "published": "2026-11-07T20:25:07.775548+00:00",
+  "added": "2026-11-07T20:25:30.733229+00:00",
+  "ai": false
+ },
+ {
+  "slug": "turk-yuksekogretimi-cop31-de",
+  "title": "Türk Yükseköğretimi COP31’de",
+  "summary": "Taraflar Konferansı’nda (COP31) üniversitelerimizin bilimsel birikimini uluslararası kamuoyuyla buluşturuyoruz. İklim değişikliğiyle mücadelede bilimin gücüne ve birlikte üreteceğimiz çözümlere inanıyoruz.",
+  "body": [
+   "Daha temiz bir çevre, daha yaşanabilir bir dünya ve gelecek nesiller için 208 üniversitemizle COP31’e hazırız. Üniversitelerimizin temiz enerji, su yönetimi, sıfır atık, döngüsel ekonomi ve iklime dirençli şehirler başta olmak üzere pek çok alanda geliştirdiği binlerce proje ve akademik çalışma, COP31’de uluslararası katılımcılarla paylaşılacak.",
+   "Paneller, stant etkinlikleri ve dijital sunumlarla Türkiye’nin sürdürülebilir bir geleceğe yönelik bilimsel ve teknolojik çözümleri tanıtılacak. Katılımcılar, “COP31 Türkiye” mobil uygulaması üzerinden etkinlik takvimine, ulaşım ve alan içi yönlendirme bilgilerine, güncel haber ve duyurulara erişebilir; katılmak istedikleri etkinlikleri kişisel ajandalarına ekleyebilirler.",
+   "Türkiye mobil uygulamasına erişmek için cop31.tr."
+  ],
+  "category": "Üniversiteler",
+  "tags": [
+   "yurt-dışı"
+  ],
+  "source": "YÖK",
+  "source_url": "https://www.yok.gov.tr/tr/announcements/turk-yuksekogretimi-cop31de-CWcuQ",
+  "raw_title": "Türk Yükseköğretimi COP31’de",
   "published": "2026-11-07T17:49:44.631671+00:00",
   "added": "2026-11-07T17:50:11.633036+00:00",
   "ai": false
@@ -1987,7 +1987,7 @@
   "source_url": "https://www.bilimsenligi.com/vgm-burs-basvurulari-basladi-ortaogrenim-ve-yuksekogrenim-burs-duyurusu.html",
   "raw_title": "VGM Burs Başvuruları Başladı! Ortaöğrenim ve Yükseköğrenim Burs Duyurusu",
   "published": "2026-11-03T22:05:04+00:00",
-  "added": "2026-11-07T17:50:11.633036+00:00",
+  "added": "2026-11-07T20:25:30.733229+00:00",
   "ai": false
  },
  {
@@ -2251,7 +2251,7 @@
   "source_url": "https://www.hamlegazetesi.com.tr/gozler-2026-vgm-burs-basvuru-sonuclarinda-milyonlarca-ogrenci-o-tarihi-bekliyor",
   "raw_title": "Gözler 2026 VGM burs başvuru sonuçlarında: Milyonlarca öğrenci o tarihi bekliyor",
   "published": "2026-11-02T17:00:00+00:00",
-  "added": "2026-11-07T17:50:11.633036+00:00",
+  "added": "2026-11-07T20:25:30.733229+00:00",
   "ai": false
  },
  {
@@ -3596,6 +3596,26 @@
   "raw_title": "Üniversitelerin, kağıt üzerinde yürütülen iş birliklerini toplum için değere dönüştürmeleri gerekiyor.",
   "published": "2026-10-26T13:30:38+00:00",
   "added": "2026-11-03T19:08:17.406431+00:00",
+  "ai": false
+ },
+ {
+  "slug": "giresun-universitesi-hemsirelik-bolumunden-erasmus-basarisi",
+  "title": "Giresun Üniversitesi Hemşirelik Bölümünden Erasmus başarısı",
+  "summary": "Türkiye Ulusal Ajansı ve yükseköğretim kurumları tarafından yürütülen uluslararası değişim programları, öğrencilere yurt dışında eğitim ve staj deneyimi kazanma imkânı sunuyor. Erasmus+ ve ikili iş birliği programlarına ilişkin güncel uygulama kuralları resmî rehberler doğrultusunda belirleniyor.",
+  "body": [
+   "Yurt dışı öğrenim ve staj hareketliliğine katılacak adayların üniversitelerindeki uluslararası ilişkiler ofisleri ile Türkiye Ulusal Ajansı duyurularını düzenli olarak takip etmesi gerekiyor."
+  ],
+  "category": "Yurt Dışı",
+  "tags": [
+   "erasmus",
+   "yurt-dışı",
+   "staj"
+  ],
+  "source": "Giresun Öncü Gazetesi",
+  "source_url": "https://giresunoncu.com/haber/29046151/giresun-universitesi-hemsirelik-bolumunden-erasmus-basarisi",
+  "raw_title": "Giresun Üniversitesi Hemşirelik Bölümünden Erasmus başarısı",
+  "published": "2026-10-26T12:55:00+00:00",
+  "added": "2026-11-07T20:25:30.733229+00:00",
   "ai": false
  },
  {
