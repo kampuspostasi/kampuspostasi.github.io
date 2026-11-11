@@ -15,8 +15,8 @@
   "source": "VGM",
   "source_url": "https://www.vgm.gov.tr/duyurular/vakiflar-genel-mudurlugu-2026-2027-egitim-yili-egitim",
   "raw_title": "Vakıflar Genel Müdürlüğü 2026-2027 Eğitim Yılı Eğitim Yardımı/burs Hizmetle... 2026-2027 Eğitim Yılı Eğitim Yardımı/Burs Başvuruları Sona Ermiştir.",
-  "published": "2026-11-11T19:47:02.058423+00:00",
-  "added": "2026-11-11T19:47:26.129093+00:00",
+  "published": "2026-11-11T22:55:08.240383+00:00",
+  "added": "2026-11-11T22:55:34.106295+00:00",
   "ai": false
  },
  {
@@ -36,6 +36,29 @@
   "raw_title": "2026 Tarım ve Orman Bakanlığı Bitki Koruma Ürünleri Bayi ve Toptancılık Yazılı Sınavı (2026-BKUBTS) Sonuçları Açıklandı",
   "published": "2026-11-11T16:28:25.384423+00:00",
   "added": "2026-11-11T16:28:50.064503+00:00",
+  "ai": false
+ },
+ {
+  "slug": "harran-universitesi-erasmus-sinav-sonuclari-aciklandi-sozlu-sinav-12-k",
+  "title": "Harran Üniversitesi Erasmus sınav sonuçları açıklandı: Sözlü sınav 12 Kasım’da",
+  "summary": "Harran Üniversitesi, Erasmus Öğrenim Hareketliliği kapsamında 9 Kasım 2026’da düzenlenen İngilizce yazılı sınavının sonuçlarını açıkladı. Yabancı Diller Yüksekokulu tarafından 11 Kasım’da yayımlanan duyuruya göre 35 ve üzerinde puan alan öğrenciler, 12 Kasım Perşembe günü saat 13.00’te sözlü sınava girebilecek.",
+  "body": [
+   "Üniversite, sınavın yapılacağı yeri ve öğrencilerin yanlarında bulundurması gereken belgeleri de bildirdi. Erasmus İngilizce yazılı sınav sonuçları yayımlandı.",
+   "Harran Üniversitesi Yabancı Diller Yüksekokulu, Erasmus öğrenim hareketliliğine başvuran öğrencilerin katıldığı İngilizce yazılı sınavının sonuç listesini resmî sayfasında erişime açtı. Yayımlanan listede adayların ad ve soyadları kısmen gizlenirken sınavdan aldıkları puanlar gösterildi.",
+   "Yazılı sınava katılmayan öğrenciler de sonuç tablosunda ayrı şekilde bildirildi. Sonuç listesindeki verilere göre 100 öğrencinin yazılı sınav puanı bulunuyor.",
+   "Ayrıca sınava katılmadığı belirtilen 45 aday yer alıyor. Listedeki puanların incelenmesiyle 35 ve üzerinde puan alan 44 öğrenci olduğu hesaplanıyor.",
+   "Sözlü sınava katılmak için en az 35 puan gerekiyor. Üniversitenin açıklamasında sözlü sınava geçiş için gerekli puan sınırı da duyuruldu.",
+   "Buna göre İngilizce yazılı sınavından en az 35 puan alan öğrenciler, dil değerlendirmesinin sözlü aşamasına katılma hakkı elde ediyor. Yazılı sınavdan 35 puanın altında kalan adaylar ise açıklanan koşula göre sözlü sınava katılamayacak."
+  ],
+  "category": "Yurt Dışı",
+  "tags": [
+   "erasmus"
+  ],
+  "source": "Urfanatik",
+  "source_url": "https://www.urfanatik.com/harran-universitesi-erasmus-sinav-sonuclari-aciklandi-sozlu-sinav-12-kasimda",
+  "raw_title": "Harran Üniversitesi Erasmus sınav sonuçları açıklandı! Sözlü sınav 12 Kasım’da",
+  "published": "2026-11-11T15:12:00+00:00",
+  "added": "2026-11-11T22:55:34.106295+00:00",
   "ai": false
  },
  {
@@ -324,6 +347,25 @@
   "ai": false
  },
  {
+  "slug": "kyk-yurdundan-goruntu-paylasan-atilacak",
+  "title": "KYK yurdundan görüntü paylaşan atılacak",
+  "summary": "Gençlik ve Spor Bakanlığı (GSB) Kredi ve Yurtlar Genel Müdürlüğü tarafından yürütülen burs, öğrenim kredisi ve yurt süreçleri e-Devlet kapısı üzerinden takip ediliyor. Başvuruda bulunan öğrencilerin beyan ettiği ekonomik, sosyal ve akademik bilgiler kamu kurumları aracılığıyla doğrulanıyor.",
+  "body": [
+   "Sonuçların ilan edilmesinin ardından burs veya öğrenim kredisi hakkı kazanan öğrencilerin, belirtilen süre içinde e-Devlet üzerinden taahhütname onayını tamamlaması gerekiyor. Ödemeler, öğrencilerin T.C. kimlik numaralarının son hanesine göre belirlenen günlerde Ziraat Bankası hesaplarına yatırılıyor."
+  ],
+  "category": "KYK & Yurtlar",
+  "tags": [
+   "kyk",
+   "burs"
+  ],
+  "source": "Haber Hürriyeti",
+  "source_url": "https://www.haberhurriyeti.com/haber/29139722/kyk-yurdundan-goruntu-paylasan-atilacak",
+  "raw_title": "KYK yurdundan görüntü paylaşan atılacak!",
+  "published": "2026-11-11T06:39:00+00:00",
+  "added": "2026-11-11T22:55:34.106295+00:00",
+  "ai": false
+ },
+ {
   "slug": "kyk-yurtlarinda-izinsiz-ogrenci-goruntusu-paylasan-yurttan-cikarilacak",
   "title": "KYK yurtlarında izinsiz öğrenci görüntüsü paylaşan yurttan çıkarılacak",
   "summary": "Gençlik ve Spor Bakanlığı (GSB) Kredi ve Yurtlar Genel Müdürlüğü tarafından yürütülen burs, öğrenim kredisi ve yurt süreçleri e-Devlet kapısı üzerinden takip ediliyor. Başvuruda bulunan öğrencilerin beyan ettiği ekonomik, sosyal ve akademik bilgiler kamu kurumları aracılığıyla doğrulanıyor.",
@@ -538,7 +580,7 @@
   "source_url": "https://www.cnnturk.com/egitim/2026-hakimlik-ve-savcilik-sinavi-ne-zaman-adli-ve-idari-yargi-sinav-tarihleri-aciklandi-mi-hakimlik-ve-savcilik-sinavi-ne-zaman-yapilacak-3491361",
   "raw_title": "2026 HAKİMLİK VE SAVCILIK SINAVI NE ZAMAN? Adli ve İdari Yargı Sınav Tarihleri Açıklandı mı? Hakimlik ve savcılık sınavı ne zaman yapılacak?",
   "published": "2026-11-10T12:35:49+00:00",
-  "added": "2026-11-11T19:47:26.129093+00:00",
+  "added": "2026-11-11T22:55:34.106295+00:00",
   "ai": false
  },
  {
@@ -741,7 +783,7 @@
   "source_url": "https://www.sabah.com.tr/egitim/turkiye-ile-azerbaycan-arasinda-yuksekogretim-alaninda-butun-dunyaya-ornek-olabilecek-isbirligi-modeli-7698229",
   "raw_title": "Türkiye ile Azerbaycan arasında yükseköğretim alanında bütün dünyaya örnek olabilecek işbirliği modeli",
   "published": "2026-11-09T13:19:21+00:00",
-  "added": "2026-11-11T19:47:26.129093+00:00",
+  "added": "2026-11-11T22:55:34.106295+00:00",
   "ai": false
  },
  {
@@ -851,6 +893,29 @@
   "raw_title": "10 Kasım resmi tatil mi 2026, bankalar, okullar, üniversiteler tatil mi değil mi?",
   "published": "2026-11-09T09:06:12+00:00",
   "added": "2026-11-09T13:09:03.439669+00:00",
+  "ai": false
+ },
+ {
+  "slug": "sanliurfa-da-burs-almaya-hak-kazanan-ogrenciler-dikkat-sure-doluyor",
+  "title": "Şanlıurfa’da burs almaya hak kazanan öğrenciler dikkat: Süre doluyor",
+  "summary": "Kredi ve Yurtlar Kurumu (KYK) burs ve öğrenim kredisi almaya hak kazanan öğrenciler için taahhütname onay sürecinde sona yaklaşıldı. Öğrencilerin işlemlerini 11 Kasım Çarşamba günü saat 23.59’a kadar e-Devlet üzerinden tamamlaması gerekiyor.",
+  "body": [
+   "Süre içinde onay vermeyenler burs veya kredi hakkından yararlanamayacak. Öğrencilerin e-Devlet’e giriş yaparak Gençlik ve Spor Bakanlığı taahhütname onayını tamamlaması gerekiyor.",
+   "15-18 yaş arasındaki öğrenciler için önce velinin, ardından öğrencinin onayı şart. Şanlıurfa’da üniversite öğrencilerini ilgilendiren KYK burs ve kredi başvurularında kritik süreç devam ediyor.",
+   "Burs veya kredi almaya hak kazanan öğrencilerin, ödemelerden yararlanabilmesi için 11 Kasım saat 23.59’a kadar e-Devlet üzerinden taahhütname onayı vermesi gerekiyor. Yurt dışında eğitim gören öğrenciler için taahhütname ve kefaletname işlemlerinin son tarihi ise 5 Aralık saat 23.59 olarak açıklandı.",
+   "Bu öğrencilerin taahhütname onayının ardından kefaletname işlemlerini de tamamlaması gerekiyor."
+  ],
+  "category": "Burslar",
+  "tags": [
+   "kyk",
+   "burs",
+   "yurt-dışı"
+  ],
+  "source": "Gazete İpekyol",
+  "source_url": "https://www.gazeteipekyol.com/haber/15742935/sanliurfada-burs-almaya-hak-kazanan",
+  "raw_title": "Şanlıurfa’da burs almaya hak kazanan öğrenciler dikkat: Süre doluyor",
+  "published": "2026-11-09T08:24:46+00:00",
+  "added": "2026-11-11T22:55:34.106295+00:00",
   "ai": false
  },
  {
