@@ -15,8 +15,8 @@
   "source": "VGM",
   "source_url": "https://www.vgm.gov.tr/duyurular/vakiflar-genel-mudurlugu-2026-2027-egitim-yili-egitim",
   "raw_title": "Vakıflar Genel Müdürlüğü 2026-2027 Eğitim Yılı Eğitim Yardımı/burs Hizmetle... 2026-2027 Eğitim Yılı Eğitim Yardımı/Burs Başvuruları Sona Ermiştir.",
-  "published": "2026-11-11T22:55:08.240383+00:00",
-  "added": "2026-11-11T22:55:34.106295+00:00",
+  "published": "2026-11-12T01:44:29.742984+00:00",
+  "added": "2026-11-12T01:45:06.704381+00:00",
   "ai": false
  },
  {
@@ -580,7 +580,7 @@
   "source_url": "https://www.cnnturk.com/egitim/2026-hakimlik-ve-savcilik-sinavi-ne-zaman-adli-ve-idari-yargi-sinav-tarihleri-aciklandi-mi-hakimlik-ve-savcilik-sinavi-ne-zaman-yapilacak-3491361",
   "raw_title": "2026 HAKİMLİK VE SAVCILIK SINAVI NE ZAMAN? Adli ve İdari Yargı Sınav Tarihleri Açıklandı mı? Hakimlik ve savcılık sınavı ne zaman yapılacak?",
   "published": "2026-11-10T12:35:49+00:00",
-  "added": "2026-11-11T22:55:34.106295+00:00",
+  "added": "2026-11-12T01:45:06.704381+00:00",
   "ai": false
  },
  {
@@ -783,7 +783,7 @@
   "source_url": "https://www.sabah.com.tr/egitim/turkiye-ile-azerbaycan-arasinda-yuksekogretim-alaninda-butun-dunyaya-ornek-olabilecek-isbirligi-modeli-7698229",
   "raw_title": "Türkiye ile Azerbaycan arasında yükseköğretim alanında bütün dünyaya örnek olabilecek işbirliği modeli",
   "published": "2026-11-09T13:19:21+00:00",
-  "added": "2026-11-11T22:55:34.106295+00:00",
+  "added": "2026-11-12T01:45:06.704381+00:00",
   "ai": false
  },
  {
@@ -1334,6 +1334,30 @@
   "raw_title": "Üniversitelerde 4 yıllık eğitim süresi düşüyor mu? YÖK Başkanı Özvar'dan yeni açıklama",
   "published": "2026-11-07T09:56:00+00:00",
   "added": "2026-11-07T11:13:36.554173+00:00",
+  "ai": false
+ },
+ {
+  "slug": "kyk-burs-odeme-gunleri-2026-nasil-belirleniyor-t-c-kimlik-numarasina-g",
+  "title": "KYK burs ödeme günleri 2026 nasıl belirleniyor, T.C. kimlik numarasına göre hangi gün yatıyor",
+  "summary": "Öğrencilerin T.C. kimlik numaralarının son rakamına göre belirlenen bu sistemde ödeme günleri beş günlük bir döneme yayılıyor. Böylece hak sahiplerinin tamamının ödemesi aynı tarihte yapılmıyor.",
+  "body": [
+   "Burs ve kredi almaya hak kazanan üniversite öğrencileri, sonuçların açıklanmasının ardından ödeme günlerini araştırmaya başladı. Ödemelerin hangi tarihte yapılacağı kadar öğrenciler arasında gün dağılımının nasıl gerçekleştiği de merak ediliyor.",
+   "Kredi ve Yurtlar Genel Müdürlüğünün uygulamasında aylık ödemeler tek bir günde tamamlanmıyor. Öğrencilerin kimlik numaralarının son rakamı, ödeme sırasının belirlenmesinde temel ölçüt olarak kullanılıyor.",
+   "KYK burs ve öğrenim kredisi ödemeleri, düzenli aylık takvimde her ayın 6'sı ile 10'u arasında gerçekleştiriliyor. Kurumun genel bilgilendirmesinde, burs ve kredilerin her ayın 6-10'uncu günleri arasında yatırıldığı belirtiliyor.",
+   "Bu aralık, düzenli aylık ödemeler için geçerli olan uygulamayı ifade ediyor. İlk kez burs veya kredi alacak öğrenciler içinse başlangıçta ayrıca bir ödeme takvimi açıklanabiliyor.",
+   "Geçmiş yıllarda kullanılan ödeme sıralamasında T.C. kimlik numarasının son hanesi 0 olan öğrenciler ayın 6'sında, 2 olanlar 7'sinde, 4 olanlar 8'inde, 6 olanlar 9'unda, 8 olanlar ise 10'unda ödeme alıyordu. Öğrencilerin kendi ödeme günlerini kontrol ederken güncel dönem için yapılacak resmî bilgilendirmeyi esas alması gerekiyor.",
+   "2026-2027 eğitim öğretim yılı burs ve öğrenim kredisi sonuçları 6 Kasım 2026 tarihinde açıklandı. Buna rağmen ilk ödemelerin hangi gün başlayacağı 7 Kasım itibarıyla duyurulmadı."
+  ],
+  "category": "KYK & Yurtlar",
+  "tags": [
+   "kyk",
+   "burs"
+  ],
+  "source": "Güneydoğu Ekspres",
+  "source_url": "https://www.guneydoguekspres.com/kyk-burs-odeme-gunleri-2026-nasil-belirleniyor-tc-kimlik-numarasina-gore-hangi-gun-yatiyor-6-10-kasim-odeme-takvimi",
+  "raw_title": "KYK burs ödeme günleri 2026 nasıl belirleniyor, T.C. kimlik numarasına göre hangi gün yatıyor? 6-10 Kasım ödeme takvimi",
+  "published": "2026-11-07T08:15:00+00:00",
+  "added": "2026-11-12T01:45:06.704381+00:00",
   "ai": false
  },
  {
